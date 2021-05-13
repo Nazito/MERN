@@ -1,0 +1,12 @@
+.textareaContainer.error {
+  border: 5px solid red;
+}
+
+.textareaContainer.error span {
+  border: 5px solid green;
+}
+
+.formSummaryError {
+  border: 3px solid greenyellow;
+  padding: 5px;
+}

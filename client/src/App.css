@@ -1,0 +1,25 @@
+
+
+.App {
+  text-align: center;
+}
+
+.App-logo {
+  height: 40vmin;
+}
+
+.App-wrapper {
+  width: 100%;
+  margin: auto;
+  display: grid;
+  grid-template-areas:
+    "header main"
+    "nav main"
+    "nav main";
+  grid-template-rows: 125px 100%;
+  grid-template-columns: minmax(360px, 2fr) 10fr;
+}
+
+.App-wrapper-content {
+  grid-area: main;
+}

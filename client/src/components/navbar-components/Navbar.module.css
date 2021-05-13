@@ -1,0 +1,33 @@
+.App_nav {
+  grid-area: nav;
+  background: #424242;
+  -webkit-box-shadow: 9px 2px 15px -1px rgba(34, 60, 80, 0.3);
+  -moz-box-shadow: 9px 2px 15px -1px rgba(34, 60, 80, 0.3);
+  box-shadow: 9px 2px 15px -1px rgba(34, 60, 80, 0.3);
+}
+
+.itemBtn {
+  display: flex !important;
+  justify-content: flex-end !important;
+  width: 100% !important;
+  height: 60px !important;
+  text-decoration: none !important;
+  color: #fff !important;
+  font-weight: 500 !important;
+  border-radius: unset !important;
+  background: linear-gradient(45deg, #424242 30%, #616161 90%) !important;
+  transition: all .4s ease-in-out !important;
+}
+
+.activeLink .itemBtn {
+  background: linear-gradient(45deg, #80deea 30%, #1ab5b3 90%) !important;
+}
+
+.itemBtn:hover{
+  background: linear-gradient(45deg, #80deea 30%, #1ab5b3 90%) !important;
+}
+
+
+.frendsItem{
+  padding: 15px;
+}

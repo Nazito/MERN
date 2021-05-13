@@ -1,0 +1,32 @@
+.profileInfoBgImg img{
+  width: 100%;
+  max-height: 250px;
+  object-fit: cover;
+}
+
+.profileUserBox{
+  margin-top: -75px !important;
+  width: fit-content;
+  margin: 0 auto;
+  text-align: center;
+}
+
+.profileUserAva{
+  width: 150px !important;
+  height: 150px !important;
+}
+
+.profileUserSettingsIcon{
+  min-width: 50px !important;
+  min-height: 50px !important;
+  background: #fff;
+  border-radius: 50%;
+}
+
+.inputUploadFile{
+  display: none;
+}
+
+.profileModalBtnBoxed{
+  padding: 10px 15px !important;
+}

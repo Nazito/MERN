@@ -1,0 +1,48 @@
+.uploader{
+  position: fixed;
+  right: 10px;
+  bottom: 10px;
+  width: 300px;
+  height: 300px;
+  overflow-y: auto !important;
+}
+
+.uploader::-webkit-scrollbar {
+  width: 3px;
+}
+ 
+.uploader::-webkit-scrollbar-track {
+  box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
+}
+ 
+.uploader::-webkit-scrollbar-thumb {
+  background-color: darkgrey;
+  outline: 1px solid slategrey;
+}
+
+.uploader__header{
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 16px;
+}
+
+.uploader__content{
+  padding: 0 !important;
+}
+
+.uploadFile{
+  display: flex;
+  flex-direction: column;
+}
+
+.uploadFile__header{
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+}
+
+.uploadFile__progress{
+  width: 100%;
+}

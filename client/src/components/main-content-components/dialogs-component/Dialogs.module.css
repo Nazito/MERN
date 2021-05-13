@@ -1,0 +1,17 @@
+.dialogs {
+  display: flex;
+}
+
+.dialogsItems {
+  flex: 1;
+  border: 1px solid red;
+}
+
+.dialog.active {
+  color: chartreuse;
+}
+
+.messages {
+  flex: 3;
+  border: 1px solid red;
+}
