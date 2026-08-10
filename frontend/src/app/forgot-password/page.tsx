@@ -1,8 +1,7 @@
 "use client";
 
-import { useEffect } from "react";
+import { useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Box from "@mui/material/Box";
@@ -13,29 +12,32 @@ import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
 import MuiLink from "@mui/material/Link";
 import FormTextField from "@/components/ui/FormTextField";
-import { useAppDispatch, useAppSelector } from "@/store/hooks";
-import { login } from "@/store/slices/authSlice";
-import { loginSchema, LoginFormValues } from "@/lib/validation/auth";
+import { useNotify } from "@/components/providers/NotificationProvider";
+import { authAPI } from "@/lib/api";
+import {
+  forgotPasswordSchema,
+  ForgotPasswordFormValues,
+} from "@/lib/validation/auth";
 
-export default function LoginPage() {
-  const dispatch = useAppDispatch();
-  const router = useRouter();
-  const { isAuth } = useAppSelector((s) => s.auth);
+export default function ForgotPasswordPage() {
+  const { success } = useNotify();
+  const [submitting, setSubmitting] = useState(false);
 
-  const { control, handleSubmit } = useForm<LoginFormValues>({
-    resolver: zodResolver(loginSchema),
-    defaultValues: { email: "", password: "" },
+  const { control, handleSubmit } = useForm<ForgotPasswordFormValues>({
+    resolver: zodResolver(forgotPasswordSchema),
+    defaultValues: { email: "" },
     mode: "onBlur",
   });
 
-  useEffect(() => {
-    if (isAuth) router.replace("/news");
-  }, [isAuth, router]);
-
   const onSubmit = handleSubmit(async (values) => {
-    const result = await dispatch(login(values));
-    if (login.fulfilled.match(result)) {
-      router.push("/news");
+    setSubmitting(true);
+    try {
+      const { data } = await authAPI.forgotPassword(values);
+      success(data.message || "Check your email for a reset link");
+    } catch {
+      // toast via axios interceptor
+    } finally {
+      setSubmitting(false);
     }
   });
 
@@ -58,10 +60,13 @@ export default function LoginPage() {
       >
         <CardContent>
           <Typography variant="overline" color="text.secondary">
-            Welcome back
+            Account recovery
           </Typography>
           <Typography variant="h5" gutterBottom>
-            Log in
+            Forgot password
+          </Typography>
+          <Typography variant="body2" color="text.secondary" mb={1}>
+            Enter your email and we will send a reset link if an account exists.
           </Typography>
           <FormTextField
             name="email"
@@ -71,27 +76,18 @@ export default function LoginPage() {
             margin="normal"
             autoComplete="email"
           />
-          <FormTextField
-            name="password"
-            control={control}
-            type="password"
-            fullWidth
-            label="Password"
-            margin="normal"
-            autoComplete="current-password"
-          />
-          <Box textAlign="right" mt={0.5}>
-            <MuiLink component={Link} href="/forgot-password" variant="body2">
-              Forgot password?
-            </MuiLink>
-          </Box>
         </CardContent>
         <CardActions sx={{ justifyContent: "space-between", px: 2, pb: 2 }}>
-          <Button type="submit" variant="contained" color="primary">
-            Log in
+          <Button
+            type="submit"
+            variant="contained"
+            color="primary"
+            disabled={submitting}
+          >
+            Send link
           </Button>
-          <MuiLink component={Link} href="/register" variant="body2">
-            Create account
+          <MuiLink component={Link} href="/login" variant="body2">
+            Back to log in
           </MuiLink>
         </CardActions>
       </Card>

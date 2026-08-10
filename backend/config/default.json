@@ -3,5 +3,14 @@
   "jwtSecret": "change-me",
   "mongoUri": "mongodb://127.0.0.1:27017/app",
   "filePath": "files",
-  "staticPath": "static"
+  "staticPath": "static",
+  "clientUrl": "http://localhost:3000",
+  "mail": {
+    "host": "",
+    "port": 587,
+    "secure": false,
+    "user": "",
+    "pass": "",
+    "from": "Circle <noreply@circle.local>"
+  }
 }
