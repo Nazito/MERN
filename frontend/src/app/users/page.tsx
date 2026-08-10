@@ -14,6 +14,7 @@ import Button from "@mui/material/Button";
 import CircularProgress from "@mui/material/CircularProgress";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { fetchUsers } from "@/store/slices/usersSlice";
+import { avatarUrl } from "@/lib/api";
 
 export default function UsersPage() {
   const dispatch = useAppDispatch();
@@ -60,13 +61,18 @@ export default function UsersPage() {
                   }}
                 />
                 <CardHeader
-                  avatar={<Avatar sx={{ bgcolor: "primary.main" }}>{initial}</Avatar>}
+                  avatar={
+                    <Avatar src={avatarUrl(user.avatar)} sx={{ bgcolor: "primary.main" }}>
+                      {initial}
+                    </Avatar>
+                  }
                   title={user.name || "No name"}
                   subheader={user.email}
                 />
                 <CardContent>
                   <Typography variant="body2" color="text.secondary">
-                    Circle member. Open the profile to see more details.
+                    {user.bio?.trim() ||
+                      "Circle member. Open the profile to see more details."}
                   </Typography>
                 </CardContent>
                 <CardActions>

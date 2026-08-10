@@ -11,15 +11,14 @@ const router = Router()
 router.get(
   '/humans', 
   async (req, res)=>{
-     const users = await User.find({})
-      // console.log(users)
     try{
+      const users = await User.find({})
+        .select('-password -resetPasswordToken -resetPasswordExpires -__v')
+        .lean()
       res.json({users})
-
     }catch(e){
       res.status(500).json({message: "что-то пошло не так users.route"})
     }
-
   })
 
 module.exports = router
