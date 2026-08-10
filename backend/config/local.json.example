@@ -1,4 +1,13 @@
 {
   "jwtSecret": "your-secret-here",
-  "mongoUri": "mongodb+srv://USER:PASSWORD@cluster0.xxxxx.mongodb.net/app?retryWrites=true&w=majority"
+  "mongoUri": "mongodb+srv://USER:PASSWORD@cluster0.xxxxx.mongodb.net/app?retryWrites=true&w=majority",
+  "clientUrl": "http://localhost:3000",
+  "mail": {
+    "host": "smtp.gmail.com",
+    "port": 587,
+    "secure": false,
+    "user": "your@gmail.com",
+    "pass": "your-app-password",
+    "from": "Circle <your@gmail.com>"
+  }
 }

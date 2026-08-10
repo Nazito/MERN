@@ -1,0 +1,141 @@
+"use client";
+
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
+import Snackbar from "@mui/material/Snackbar";
+import Alert from "@mui/material/Alert";
+import Stack from "@mui/material/Stack";
+import {
+  setNotificationHandler,
+  type NotifyOptions,
+} from "@/lib/notificationBus";
+
+export type { NotifyOptions };
+
+type NotificationItem = NotifyOptions & {
+  id: string;
+};
+
+type NotificationContextValue = {
+  notify: (options: NotifyOptions | string) => void;
+  success: (message: string) => void;
+  error: (message: string) => void;
+  info: (message: string) => void;
+  warning: (message: string) => void;
+};
+
+const NotificationContext = createContext<NotificationContextValue | null>(
+  null
+);
+
+const DEFAULT_DURATION = 4000;
+
+export function NotificationProvider({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  const [items, setItems] = useState<NotificationItem[]>([]);
+
+  const remove = useCallback((id: string) => {
+    setItems((prev) => prev.filter((item) => item.id !== id));
+  }, []);
+
+  const notify = useCallback((options: NotifyOptions | string) => {
+    const payload =
+      typeof options === "string" ? { message: options } : options;
+
+    if (!payload.message) return;
+
+    const id = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+    setItems((prev) => [
+      ...prev,
+      {
+        id,
+        message: payload.message,
+        severity: payload.severity || "info",
+        duration: payload.duration ?? DEFAULT_DURATION,
+      },
+    ]);
+  }, []);
+
+  const value = useMemo<NotificationContextValue>(
+    () => ({
+      notify,
+      success: (message) => notify({ message, severity: "success" }),
+      error: (message) => notify({ message, severity: "error" }),
+      info: (message) => notify({ message, severity: "info" }),
+      warning: (message) => notify({ message, severity: "warning" }),
+    }),
+    [notify]
+  );
+
+  useEffect(() => {
+    setNotificationHandler(value.notify);
+    return () => setNotificationHandler(null);
+  }, [value.notify]);
+
+  return (
+    <NotificationContext.Provider value={value}>
+      {children}
+      <Stack
+        spacing={1}
+        sx={{
+          position: "fixed",
+          top: 24,
+          right: 24,
+          zIndex: (theme) => theme.zIndex.snackbar,
+          maxWidth: 420,
+          width: "calc(100% - 48px)",
+          pointerEvents: "none",
+        }}
+      >
+        {items.map((item) => (
+          <Snackbar
+            key={item.id}
+            open
+            anchorOrigin={{ vertical: "top", horizontal: "right" }}
+            autoHideDuration={item.duration}
+            onClose={(_, reason) => {
+              if (reason === "clickaway") return;
+              remove(item.id);
+            }}
+            sx={{
+              position: "relative",
+              top: "auto !important",
+              right: "auto !important",
+              left: "auto !important",
+              bottom: "auto !important",
+              transform: "none !important",
+              pointerEvents: "auto",
+            }}
+          >
+            <Alert
+              severity={item.severity}
+              variant="filled"
+              elevation={4}
+              onClose={() => remove(item.id)}
+              sx={{ width: "100%", alignItems: "center" }}
+            >
+              {item.message}
+            </Alert>
+          </Snackbar>
+        ))}
+      </Stack>
+    </NotificationContext.Provider>
+  );
+}
+
+export function useNotify() {
+  const ctx = useContext(NotificationContext);
+  if (!ctx) {
+    throw new Error("useNotify must be used within NotificationProvider");
+  }
+  return ctx;
+}

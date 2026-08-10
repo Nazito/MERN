@@ -1,4 +1,5 @@
 import axios from "axios";
+import { notifyFromServer } from "@/lib/notificationBus";
 
 const api = axios.create({
   baseURL: "/",
@@ -17,12 +18,33 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
+api.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (typeof window !== "undefined") {
+      const message =
+        error?.response?.data?.message ||
+        error?.response?.data?.msg ||
+        error?.message;
+
+      if (message && error?.response?.status !== 401) {
+        notifyFromServer({ message: String(message), severity: "error" });
+      }
+    }
+    return Promise.reject(error);
+  }
+);
+
 export const authAPI = {
   me: () => api.get("/api/auth/me"),
   login: (form: { email: string; password: string }) =>
     api.post("/api/auth/login", form),
   register: (form: { email: string; password: string; name: string }) =>
     api.post("/api/auth/register", form),
+  forgotPassword: (form: { email: string }) =>
+    api.post("/api/auth/forgot-password", form),
+  resetPassword: (form: { token: string; password: string }) =>
+    api.post("/api/auth/reset-password", form),
 };
 
 export const usersAPI = {

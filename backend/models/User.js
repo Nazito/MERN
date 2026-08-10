@@ -7,6 +7,8 @@ const schema = new Schema({
   diskSpace: {type: Number, default: 1024**3*10},
   usedSpace: {type: Number, default: 0},
   avatar: {type: String},
-  files: [{type: ObjectId, ref: 'File'}]
+  files: [{type: ObjectId, ref: 'File'}],
+  resetPasswordToken: {type: String},
+  resetPasswordExpires: {type: Date},
 })
 module.exports = model('User', schema) 

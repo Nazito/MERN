@@ -1,5 +1,6 @@
 const {Router} = require('express')
 const bcrypt = require('bcryptjs')
+const crypto = require('crypto')
 const config = require('config')
 const jwt = require('jsonwebtoken')
 const {check, validationResult} = require('express-validator')
@@ -8,6 +9,7 @@ const router = Router()
 const authMiddleware = require('../middleware/auth.middleware')
 const fileService = require('../services/fileService')
 const File = require('../models/File')
+const { sendMail } = require('../services/mailService')
 
 
 
@@ -150,5 +152,109 @@ router.get(
     }
 
   })
+
+const GENERIC_FORGOT_MESSAGE =
+  'If an account with that email exists, a password reset link has been sent.'
+
+// /api/auth/forgot-password
+router.post(
+  '/forgot-password',
+  [check('email', 'Invalid email').normalizeEmail().isEmail()],
+  async (req, res) => {
+    try {
+      const errors = validationResult(req)
+      if (!errors.isEmpty()) {
+        return res.status(400).json({
+          errors: errors.array(),
+          message: 'Invalid email',
+        })
+      }
+
+      const { email } = req.body
+      const user = await User.findOne({ email })
+
+      // Always return the same message (do not leak whether the email exists)
+      if (!user) {
+        return res.json({ message: GENERIC_FORGOT_MESSAGE })
+      }
+
+      const rawToken = crypto.randomBytes(32).toString('hex')
+      const hashedToken = crypto
+        .createHash('sha256')
+        .update(rawToken)
+        .digest('hex')
+
+      user.resetPasswordToken = hashedToken
+      user.resetPasswordExpires = new Date(Date.now() + 60 * 60 * 1000) // 1 hour
+      await user.save()
+
+      const clientUrl = config.get('clientUrl')
+      const resetUrl = `${clientUrl}/reset-password?token=${rawToken}`
+
+      await sendMail({
+        to: user.email,
+        subject: 'Reset your Circle password',
+        text: `Reset your password: ${resetUrl}\n\nThis link expires in 1 hour. If you did not request this, ignore this email.`,
+        html: `
+          <p>You requested a password reset for your Circle account.</p>
+          <p><a href="${resetUrl}">Reset password</a></p>
+          <p>This link expires in 1 hour. If you did not request this, you can ignore this email.</p>
+        `,
+      })
+
+      return res.json({ message: GENERIC_FORGOT_MESSAGE })
+    } catch (e) {
+      console.error(e)
+      res.status(500).json({ message: 'Could not process password reset request' })
+    }
+  }
+)
+
+// /api/auth/reset-password
+router.post(
+  '/reset-password',
+  [
+    check('token', 'Reset token is required').notEmpty(),
+    check('password', 'Password must be at least 6 characters').isLength({ min: 6 }),
+  ],
+  async (req, res) => {
+    try {
+      const errors = validationResult(req)
+      if (!errors.isEmpty()) {
+        return res.status(400).json({
+          errors: errors.array(),
+          message: 'Invalid reset data',
+        })
+      }
+
+      const { token, password } = req.body
+      const hashedToken = crypto
+        .createHash('sha256')
+        .update(token)
+        .digest('hex')
+
+      const user = await User.findOne({
+        resetPasswordToken: hashedToken,
+        resetPasswordExpires: { $gt: new Date() },
+      })
+
+      if (!user) {
+        return res.status(400).json({
+          message: 'Reset link is invalid or has expired',
+        })
+      }
+
+      user.password = await bcrypt.hash(password, 12)
+      user.resetPasswordToken = undefined
+      user.resetPasswordExpires = undefined
+      await user.save()
+
+      return res.json({ message: 'Password has been reset. You can log in now.' })
+    } catch (e) {
+      console.error(e)
+      res.status(500).json({ message: 'Could not reset password' })
+    }
+  }
+)
 
 module.exports = router
