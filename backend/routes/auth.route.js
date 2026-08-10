@@ -112,6 +112,7 @@ router.post(
         user:{
           name: user.name, 
           userId: user.id,
+          avatar: user.avatar || null,
           message: "login succes"
         }
       })
@@ -143,6 +144,7 @@ router.get(
         user:{
           name: user.name, 
           userId: user.id,
+          avatar: user.avatar || null,
           message: "login succes"
         }
       })

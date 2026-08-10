@@ -1,6 +1,6 @@
-import { createSlice } from "@reduxjs/toolkit";
+import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
-type Friend = { name: string; ava: string };
+export type Friend = { name: string; ava: string };
 
 type FriendsState = {
   friends: Friend[];
@@ -19,7 +19,17 @@ const initialState: FriendsState = {
 const friendsSlice = createSlice({
   name: "friends",
   initialState,
-  reducers: {},
+  reducers: {
+    addFriend(state, action: PayloadAction<Friend>) {
+      const exists = state.friends.some(
+        (f) => f.name.toLowerCase() === action.payload.name.toLowerCase()
+      );
+      if (!exists) {
+        state.friends.push(action.payload);
+      }
+    },
+  },
 });
 
+export const { addFriend } = friendsSlice.actions;
 export default friendsSlice.reducer;

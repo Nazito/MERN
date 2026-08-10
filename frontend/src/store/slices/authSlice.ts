@@ -91,6 +91,20 @@ const authSlice = createSlice({
     clearAuthMessage(state) {
       state.authMsg = null;
     },
+    setAuthProfile(
+      state,
+      action: PayloadAction<{ name?: string; avatar?: string | null }>
+    ) {
+      if (action.payload.name) {
+        state.name = action.payload.name;
+        if (state.currentUser) {
+          state.currentUser.name = action.payload.name;
+        }
+      }
+      if ("avatar" in action.payload && state.currentUser) {
+        state.currentUser.avatar = action.payload.avatar || undefined;
+      }
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -133,5 +147,5 @@ const authSlice = createSlice({
   },
 });
 
-export const { logout, clearAuthMessage } = authSlice.actions;
+export const { logout, clearAuthMessage, setAuthProfile } = authSlice.actions;
 export default authSlice.reducer;

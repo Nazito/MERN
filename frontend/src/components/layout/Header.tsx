@@ -19,10 +19,12 @@ import LogoutIcon from "@mui/icons-material/Logout";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { logout } from "@/store/slices/authSlice";
+import { avatarUrl } from "@/lib/api";
 
 export default function Header() {
   const dispatch = useAppDispatch();
-  const { isAuth, name } = useAppSelector((s) => s.auth);
+  const { isAuth, name, currentUser } = useAppSelector((s) => s.auth);
+  const photo = avatarUrl(currentUser?.avatar);
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const menuOpen = Boolean(anchorEl);
 
@@ -91,7 +93,10 @@ export default function Header() {
                 "&:hover": { bgcolor: "action.hover" },
               }}
             >
-              <Avatar sx={{ width: 32, height: 32, fontSize: 14 }}>
+              <Avatar
+                src={photo}
+                sx={{ width: 32, height: 32, fontSize: 14, bgcolor: "primary.main" }}
+              >
                 {(name || "U").slice(0, 1).toUpperCase()}
               </Avatar>
               <Typography
@@ -130,11 +135,21 @@ export default function Header() {
                 },
               }}
             >
-              <Box px={2} py={1.25}>
-                <Typography variant="subtitle2">{name}</Typography>
-                <Typography variant="caption" color="text.secondary">
-                  Your account
-                </Typography>
+              <Box px={2} py={1.25} display="flex" alignItems="center" gap={1.25}>
+                <Avatar
+                  src={photo}
+                  sx={{ width: 40, height: 40, bgcolor: "primary.main" }}
+                >
+                  {(name || "U").slice(0, 1).toUpperCase()}
+                </Avatar>
+                <Box minWidth={0}>
+                  <Typography variant="subtitle2" noWrap>
+                    {name}
+                  </Typography>
+                  <Typography variant="caption" color="text.secondary">
+                    Your account
+                  </Typography>
+                </Box>
               </Box>
               <Divider />
               <MenuItem component={Link} href="/profile">
