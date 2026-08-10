@@ -1,11 +1,12 @@
 "use client";
 
+import { useState } from "react";
 import Box from "@mui/material/Box";
 import Paper from "@mui/material/Paper";
 import Typography from "@mui/material/Typography";
 import Avatar from "@mui/material/Avatar";
-import Chip from "@mui/material/Chip";
 import Button from "@mui/material/Button";
+import TextField from "@mui/material/TextField";
 import Card from "@mui/material/Card";
 import CardHeader from "@mui/material/CardHeader";
 import CardContent from "@mui/material/CardContent";
@@ -14,10 +15,12 @@ import Divider from "@mui/material/Divider";
 import FavoriteIcon from "@mui/icons-material/Favorite";
 import ChatBubbleIcon from "@mui/icons-material/ChatBubble";
 import ShareIcon from "@mui/icons-material/Share";
+import { useAppDispatch, useAppSelector } from "@/store/hooks";
+import { addPost } from "@/store/slices/profileSlice";
 
-const feed = [
+const demoFeed = [
   {
-    id: 1,
+    id: "demo-1",
     author: "Maria K.",
     initials: "MK",
     time: "12 min",
@@ -27,7 +30,7 @@ const feed = [
     shares: 3,
   },
   {
-    id: 2,
+    id: "demo-2",
     author: "Ilya R.",
     initials: "IR",
     time: "1 h",
@@ -37,7 +40,7 @@ const feed = [
     shares: 11,
   },
   {
-    id: 3,
+    id: "demo-3",
     author: "Circle Team",
     initials: "CT",
     time: "yesterday",
@@ -49,35 +52,85 @@ const feed = [
 ];
 
 export default function NewsPage() {
+  const dispatch = useAppDispatch();
+  const { name } = useAppSelector((s) => s.auth);
+  const posts = useAppSelector((s) => s.profile.posts);
+  const [text, setText] = useState("");
+
+  const onPublish = () => {
+    const value = text.trim();
+    if (!value) return;
+    dispatch(addPost(value));
+    setText("");
+  };
+
+  const ownPosts = [...posts]
+    .reverse()
+    .map((p) => ({
+      id: `own-${p.id}`,
+      author: name || "You",
+      initials: (name || "Y").slice(0, 1).toUpperCase(),
+      time: "just now",
+      text: p.message,
+      likes: p.like,
+      comments: 0,
+      shares: 0,
+    }));
+
+  const feed = [...ownPosts, ...demoFeed];
+
   return (
     <Box p={3}>
-      <Box display="flex" justifyContent="space-between" alignItems="flex-end" mb={2.5} gap={2}>
-        <Box>
-          <Typography variant="overline" color="text.secondary">
-            Home
-          </Typography>
-          <Typography variant="h4">Feed</Typography>
-          <Typography variant="body2" color="text.secondary">
-            What is new with people in your circle
-          </Typography>
-        </Box>
-        <Chip label="demo posts" color="primary" variant="outlined" size="small" />
+      <Box mb={2.5}>
+        <Typography variant="overline" color="text.secondary">
+          Home
+        </Typography>
+        <Typography variant="h4">Feed</Typography>
+        <Typography variant="body2" color="text.secondary">
+          What is new with people in your circle
+        </Typography>
       </Box>
 
       <Paper
         elevation={0}
-        sx={{ p: 2, mb: 2, bgcolor: "grey.50", border: "1px solid", borderColor: "divider" }}
+        sx={{
+          p: 2,
+          mb: 2,
+          borderRadius: 4,
+          border: "1px solid",
+          borderColor: "divider",
+          bgcolor: "grey.50",
+        }}
       >
-        <Typography variant="subtitle1" gutterBottom>
-          What is on your mind?
-        </Typography>
-        <Typography variant="body2" color="text.secondary" paragraph>
-          Post composer will arrive later. For now enjoy the demo feed.
-        </Typography>
-        <Box display="flex" gap={1}>
-          <Chip label="Photo" size="small" />
-          <Chip label="Music" size="small" />
-          <Chip label="Poll" size="small" />
+        <Box display="flex" gap={1.5} alignItems="flex-start">
+          <Avatar sx={{ mt: 0.5 }}>
+            {(name || "U").slice(0, 1).toUpperCase()}
+          </Avatar>
+          <Box flex={1} minWidth={0}>
+            <TextField
+              fullWidth
+              multiline
+              minRows={2}
+              placeholder="What is on your mind?"
+              value={text}
+              onChange={(e) => setText(e.target.value)}
+              sx={{
+                "& .MuiOutlinedInput-root": {
+                  bgcolor: "background.paper",
+                  borderRadius: 3,
+                },
+              }}
+            />
+            <Box mt={1.5} display="flex" justifyContent="flex-end">
+              <Button
+                variant="contained"
+                onClick={onPublish}
+                disabled={!text.trim()}
+              >
+                Post
+              </Button>
+            </Box>
+          </Box>
         </Box>
       </Paper>
 

@@ -11,21 +11,17 @@ import Typography from "@mui/material/Typography";
 import Divider from "@mui/material/Divider";
 import Box from "@mui/material/Box";
 import Avatar from "@mui/material/Avatar";
-import PersonIcon from "@mui/icons-material/Person";
 import HomeIcon from "@mui/icons-material/Home";
 import ChatBubbleIcon from "@mui/icons-material/ChatBubble";
 import PeopleIcon from "@mui/icons-material/People";
 import LibraryMusicIcon from "@mui/icons-material/LibraryMusic";
-import SettingsIcon from "@mui/icons-material/Settings";
 import { useAppSelector } from "@/store/hooks";
 
 const links = [
-  { href: "/profile", label: "Profile", icon: PersonIcon },
   { href: "/news", label: "Feed", icon: HomeIcon },
   { href: "/message", label: "Messages", icon: ChatBubbleIcon },
   { href: "/users", label: "People", icon: PeopleIcon },
   { href: "/music", label: "Music", icon: LibraryMusicIcon },
-  { href: "/settings", label: "Settings", icon: SettingsIcon },
 ];
 
 export default function Sidebar() {
@@ -60,6 +56,9 @@ export default function Sidebar() {
               selected={selected}
               sx={{
                 mb: 0.5,
+                borderRadius: 3,
+                px: 1.5,
+                py: 1,
                 "&.Mui-selected": {
                   bgcolor: "primary.main",
                   color: "primary.contrastText",
