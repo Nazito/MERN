@@ -1,0 +1,117 @@
+.musicContainer{
+  padding: 20px;
+  min-height: 100%;
+  background: linear-gradient(180deg, #fbfcfd 0%, #ffffff 40%);
+}
+
+.musicList{
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 14px;
+  padding: 0;
+}
+
+.musicContainerNav{
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+  padding: 0 0 16px;
+  margin-bottom: 8px;
+  border-bottom: 1px solid var(--line);
+}
+
+.musicContainerNavItem{
+  margin-right: 0 !important;
+}
+
+
+.musicDragContainer{
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  height: 100%;
+}
+
+.musicDragContainerContent{
+  width: 90%;
+  height: 90%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px dashed;
+}
+
+.musicItem{
+  width: 33.3333%;
+  padding: 10px;
+  box-sizing: border-box;
+}
+
+.root{
+  position: relative;
+  display: flex;
+  justify-content: space-between;
+  height: 100%;
+}
+
+.playListMedia{
+  height: 100%;
+  min-height: 180px;
+}
+
+.playListInfo{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  position: absolute;
+  right: 0;
+  top: 0;
+  width: 30%;
+  height: 100%;
+  background: rgba(255, 255, 255, .3);
+}
+
+.playListCount{
+  color: #fff;
+}
+.playListIcon{
+  width: 30px !important;
+  height: 30px !important;
+  color: #fff;
+}
+
+.details{
+  display: flex;
+  flex-direction: column;
+  width: 70%;
+}
+.content {
+  flex: 1 0 auto;
+}
+.cover {
+  width: 30%;
+}
+.controls {
+  display: flex;
+  align-items: center;
+}
+.playIcon {
+  height: 38px;
+  width: 38px;
+}
+
+.inputUploadFile{
+  display: none;
+}
+
+.inputUploadBtn{
+  margin-right: 10px;
+}
+
+.formControl{
+  width: 120px !important;
+}
+
+

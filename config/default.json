@@ -1,7 +1,0 @@
-{
-  "port": 5000,
-  "jwtSecret": "Nazito",  
-  "mongoUri": "mongodb+srv://naz:Azsxdcfvgb555@cluster0.lgvjs.mongodb.net/app?retryWrites=true&w=majority",
-  "filePath": "C:/OSPanel/domains/localhost/social-network-server/files",
-  "staticPath": "C:/OSPanel/domains/localhost/social-network-server/static"
-}

@@ -1,0 +1,37 @@
+.profileInfoBgImg img {
+  width: 100%;
+  max-height: 220px;
+  object-fit: cover;
+  border-bottom: 1px solid var(--line);
+}
+
+.profileUserBox {
+  margin-top: -64px !important;
+  width: fit-content;
+  margin: 0 auto;
+  text-align: center;
+  padding-bottom: 16px;
+}
+
+.profileUserAva {
+  width: 128px !important;
+  height: 128px !important;
+  border: 4px solid #fff !important;
+  box-shadow: var(--shadow);
+}
+
+.profileUserSettingsIcon {
+  min-width: 44px !important;
+  min-height: 44px !important;
+  background: #fff;
+  border-radius: 50%;
+  border: 1px solid var(--line);
+}
+
+.inputUploadFile {
+  display: none;
+}
+
+.profileModalBtnBoxed {
+  padding: 10px 15px !important;
+}

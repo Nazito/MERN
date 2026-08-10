@@ -1,13 +1,14 @@
 {
   "name": "mern",
   "version": "1.0.0",
+  "private": true,
   "description": "mern stack",
-  "main": "app.js",
   "scripts": {
-    "start": "node app.js",
-    "server": "nodemon app.js",
-    "client": "npm run start --prefix client",
-    "dev": "concurrently \"npm run server\" \"npm run client\" "
+    "dev": "concurrently \"npm run server\" \"npm run frontend\"",
+    "server": "npm run server --prefix backend",
+    "frontend": "npm start --prefix frontend",
+    "start": "npm start --prefix backend",
+    "install:all": "npm install --prefix backend && npm install --prefix frontend"
   },
   "keywords": [
     "mern",
@@ -15,22 +16,7 @@
   ],
   "author": "Tolstoy Nazar <mobidik460@gmail.com>",
   "license": "ISC",
-  "dependencies": {
-    "@material-ui/icons": "^4.11.2",
-    "bcryptjs": "^2.4.3",
-    "config": "^3.3.6",
-    "express": "^4.17.1",
-    "express-fileupload": "^1.2.1",
-    "express-validator": "^6.10.0",
-    "jsonwebtoken": "^8.5.1",
-    "mongoose": "^5.12.0",
-    "node-sass": "^5.0.0",
-    "react-materialize": "^3.9.7",
-    "react-transition-group": "^4.4.1",
-    "uuid": "^8.3.2"
-  },
   "devDependencies": {
-    "concurrently": "^5.3.0",
-    "nodemon": "^2.0.7"
+    "concurrently": "^5.3.0"
   }
 }

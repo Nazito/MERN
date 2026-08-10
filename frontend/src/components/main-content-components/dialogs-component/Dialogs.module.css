@@ -1,0 +1,74 @@
+.dialogs {
+  display: grid;
+  grid-template-columns: 280px 1fr;
+  min-height: 100%;
+  height: calc(100vh - var(--header) - 48px);
+}
+
+.sidebar {
+  border-right: 1px solid var(--line);
+  background: var(--surface-2);
+  padding: 16px;
+  overflow: auto;
+}
+
+.chat {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.chatHeader {
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--line);
+}
+
+.dialogsItems {
+  display: grid;
+  gap: 8px;
+}
+
+.messages {
+  flex: 1;
+  overflow: auto;
+  padding: 20px;
+  display: grid;
+  gap: 10px;
+  align-content: start;
+  background:
+    linear-gradient(180deg, #ffffff 0%, #f7faf9 100%);
+}
+
+.composer {
+  padding: 14px 16px;
+  border-top: 1px solid var(--line);
+  background: #fff;
+}
+
+.composer form {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 10px;
+  align-items: end;
+}
+
+.composer button {
+  height: 42px;
+  padding: 0 16px;
+  border-radius: 12px;
+  background: var(--accent);
+  color: #fff;
+  font-weight: 600;
+}
+
+@media (max-width: 800px) {
+  .dialogs {
+    grid-template-columns: 1fr;
+    height: auto;
+  }
+
+  .sidebar {
+    border-right: 0;
+    border-bottom: 1px solid var(--line);
+  }
+}

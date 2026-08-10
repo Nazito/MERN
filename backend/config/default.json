@@ -1,0 +1,7 @@
+{
+  "port": 5001,
+  "jwtSecret": "change-me",
+  "mongoUri": "mongodb://127.0.0.1:27017/app",
+  "filePath": "files",
+  "staticPath": "static"
+}

@@ -1,0 +1,4 @@
+{
+  "jwtSecret": "your-secret-here",
+  "mongoUri": "mongodb+srv://USER:PASSWORD@cluster0.xxxxx.mongodb.net/app?retryWrites=true&w=majority"
+}
