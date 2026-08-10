@@ -68,10 +68,12 @@ export function NotificationProvider({
   const value = useMemo<NotificationContextValue>(
     () => ({
       notify,
-      success: (message) => notify({ message, severity: "success" }),
-      error: (message) => notify({ message, severity: "error" }),
-      info: (message) => notify({ message, severity: "info" }),
-      warning: (message) => notify({ message, severity: "warning" }),
+      success: (message: string) =>
+        notify({ message, severity: "success" }),
+      error: (message: string) => notify({ message, severity: "error" }),
+      info: (message: string) => notify({ message, severity: "info" }),
+      warning: (message: string) =>
+        notify({ message, severity: "warning" }),
     }),
     [notify]
   );

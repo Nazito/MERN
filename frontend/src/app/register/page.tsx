@@ -54,7 +54,7 @@ export default function RegisterPage() {
         component="form"
         onSubmit={onSubmit}
         variant="outlined"
-        sx={{ width: "100%", maxWidth: 420, borderRadius: 5 }}
+        sx={{ width: "100%", maxWidth: 420, borderRadius: 2 }}
       >
         <CardContent>
           <Typography

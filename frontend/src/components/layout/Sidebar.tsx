@@ -15,9 +15,11 @@ import Avatar from "@mui/material/Avatar";
 import Button from "@mui/material/Button";
 import Skeleton from "@mui/material/Skeleton";
 import Stack from "@mui/material/Stack";
+import Badge from "@mui/material/Badge";
 import HomeIcon from "@mui/icons-material/Home";
 import ChatBubbleIcon from "@mui/icons-material/ChatBubble";
 import PeopleIcon from "@mui/icons-material/People";
+import PeopleOutlineIcon from "@mui/icons-material/PeopleOutline";
 import LibraryMusicIcon from "@mui/icons-material/LibraryMusic";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { fetchUsers } from "@/store/slices/usersSlice";
@@ -26,6 +28,7 @@ import { avatarUrl } from "@/lib/api";
 const links = [
   { href: "/news", label: "Feed", icon: HomeIcon },
   { href: "/message", label: "Messages", icon: ChatBubbleIcon },
+  { href: "/friends", label: "Friends", icon: PeopleOutlineIcon, badgeKey: "requests" as const },
   { href: "/users", label: "People", icon: PeopleIcon },
   { href: "/music", label: "Music", icon: LibraryMusicIcon },
 ];
@@ -37,6 +40,7 @@ export default function Sidebar() {
   const dispatch = useAppDispatch();
   const { users, status } = useAppSelector((s) => s.users);
   const currentUserId = useAppSelector((s) => s.auth.currentUser?.userId);
+  const requestCount = useAppSelector((s) => s.friends.requests.length);
 
   useEffect(() => {
     if (status === "idle") {
@@ -57,7 +61,7 @@ export default function Sidebar() {
         p: 1.5,
         border: "1px solid",
         borderColor: "divider",
-        borderRadius: 4,
+        borderRadius: 2,
         boxShadow: "0 10px 30px rgba(21, 32, 43, 0.06)",
         height: "fit-content",
         position: { md: "sticky" },
@@ -70,6 +74,10 @@ export default function Sidebar() {
           const Icon = link.icon;
           const selected =
             pathname === link.href || pathname.startsWith(link.href + "/");
+          const badge =
+            "badgeKey" in link && link.badgeKey === "requests"
+              ? requestCount
+              : 0;
           return (
             <ListItemButton
               key={link.href}
@@ -78,7 +86,7 @@ export default function Sidebar() {
               selected={selected}
               sx={{
                 mb: 0.5,
-                borderRadius: 3,
+                borderRadius: 1.5,
                 px: 1.5,
                 py: 1,
                 "&.Mui-selected": {
@@ -89,8 +97,32 @@ export default function Sidebar() {
                 },
               }}
             >
-              <ListItemIcon sx={{ minWidth: 36, color: "text.secondary" }}>
-                <Icon fontSize="small" />
+              <ListItemIcon
+                sx={{
+                  minWidth: 36,
+                  color: "text.secondary",
+                  overflow: "visible",
+                }}
+              >
+                <Badge
+                  badgeContent={badge}
+                  color="error"
+                  max={9}
+                  invisible={!badge}
+                  overlap="circular"
+                  sx={{
+                    "& .MuiBadge-badge": {
+                      fontSize: 10,
+                      minWidth: 16,
+                      height: 16,
+                      padding: "0 4px",
+                      top: -2,
+                      right: -4,
+                    },
+                  }}
+                >
+                  <Icon fontSize="small" />
+                </Badge>
               </ListItemIcon>
               <ListItemText primary={link.label} />
             </ListItemButton>
@@ -164,7 +196,7 @@ export default function Sidebar() {
                     gap: 1.25,
                     px: 1,
                     py: 0.85,
-                    borderRadius: 3,
+                    borderRadius: 1.5,
                     color: "inherit",
                     textDecoration: "none",
                     transition: "background-color 0.15s ease",

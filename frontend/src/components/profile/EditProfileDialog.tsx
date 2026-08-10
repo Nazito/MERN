@@ -145,7 +145,7 @@ export default function EditProfileDialog({
         onClose={onClose}
         fullWidth
         maxWidth="sm"
-        PaperProps={{ sx: { borderRadius: 4 } }}
+        PaperProps={{ sx: { borderRadius: 2 } }}
       >
         <DialogTitle>Edit profile</DialogTitle>
         <DialogContent>

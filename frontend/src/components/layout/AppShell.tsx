@@ -50,7 +50,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
           bgcolor: "background.paper",
           border: "1px solid",
           borderColor: "divider",
-          borderRadius: 4,
+          borderRadius: 2,
           boxShadow: "0 10px 30px rgba(21, 32, 43, 0.06)",
           overflow: "hidden",
           minWidth: 0,
