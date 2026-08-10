@@ -1,23 +1,20 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useParams } from "next/navigation";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import Avatar from "@mui/material/Avatar";
 import Paper from "@mui/material/Paper";
-import TextField from "@mui/material/TextField";
-import Button from "@mui/material/Button";
 import CircularProgress from "@mui/material/CircularProgress";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
-import { addPost, fetchProfile } from "@/store/slices/profileSlice";
+import { fetchProfile } from "@/store/slices/profileSlice";
 
 export default function ProfilePage() {
   const params = useParams<{ userId?: string | string[] }>();
   const dispatch = useAppDispatch();
   const { profile, posts, status } = useAppSelector((s) => s.profile);
   const auth = useAppSelector((s) => s.auth);
-  const [text, setText] = useState("");
 
   const rawId = params?.userId;
   const userId = Array.isArray(rawId) ? rawId[0] : rawId;
@@ -28,13 +25,6 @@ export default function ProfilePage() {
       dispatch(fetchProfile(String(targetId)));
     }
   }, [dispatch, targetId]);
-
-  const onPublish = () => {
-    const value = text.trim();
-    if (!value) return;
-    dispatch(addPost(value));
-    setText("");
-  };
 
   return (
     <Box>
@@ -74,21 +64,6 @@ export default function ProfilePage() {
         <Typography variant="h5" gutterBottom>
           Posts
         </Typography>
-        <Paper variant="outlined" sx={{ p: 2, mb: 2, bgcolor: "grey.50" }}>
-          <TextField
-            fullWidth
-            multiline
-            minRows={2}
-            placeholder="What is on your mind?"
-            value={text}
-            onChange={(e) => setText(e.target.value)}
-          />
-          <Box mt={1.5}>
-            <Button variant="contained" onClick={onPublish}>
-              Publish
-            </Button>
-          </Box>
-        </Paper>
 
         {[...posts].reverse().map((p) => (
           <Paper key={p.id} variant="outlined" sx={{ p: 1.75, mb: 1.5, borderRadius: 3 }}>
