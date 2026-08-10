@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
 import AppBar from "@mui/material/AppBar";
 import Toolbar from "@mui/material/Toolbar";
@@ -7,15 +8,21 @@ import Typography from "@mui/material/Typography";
 import Button from "@mui/material/Button";
 import Avatar from "@mui/material/Avatar";
 import Box from "@mui/material/Box";
+import IconButton from "@mui/material/IconButton";
+import Menu from "@mui/material/Menu";
+import MenuItem from "@mui/material/MenuItem";
+import ListItemIcon from "@mui/material/ListItemIcon";
+import Divider from "@mui/material/Divider";
+import PersonOutlineIcon from "@mui/icons-material/PersonOutline";
+import SettingsOutlinedIcon from "@mui/icons-material/SettingsOutlined";
+import LogoutIcon from "@mui/icons-material/Logout";
+import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { logout } from "@/store/slices/authSlice";
 import { avatarUrl } from "@/lib/api";
 
 export default function Header() {
   const dispatch = useAppDispatch();
-<<<<<<< Updated upstream
-  const { isAuth, name } = useAppSelector((s) => s.auth);
-=======
   const { isAuth, name, currentUser } = useAppSelector((s) => s.auth);
   const photo = avatarUrl(currentUser?.avatar);
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
@@ -27,7 +34,6 @@ export default function Header() {
     closeMenu();
     dispatch(logout());
   };
->>>>>>> Stashed changes
 
   return (
     <AppBar
@@ -68,17 +74,6 @@ export default function Header() {
         </Box>
 
         {isAuth ? (
-<<<<<<< Updated upstream
-          <Box display="flex" alignItems="center" gap={1.25}>
-            <Avatar sx={{ width: 36, height: 36 }}>
-              {(name || "U").slice(0, 1).toUpperCase()}
-            </Avatar>
-            <Typography variant="subtitle2">{name}</Typography>
-            <Button variant="outlined" size="small" onClick={() => dispatch(logout())}>
-              Log out
-            </Button>
-          </Box>
-=======
           <>
             <IconButton
               onClick={(e) => setAnchorEl(e.currentTarget)}
@@ -178,13 +173,17 @@ export default function Header() {
               </MenuItem>
             </Menu>
           </>
->>>>>>> Stashed changes
         ) : (
           <Box display="flex" alignItems="center" gap={1}>
             <Button component={Link} href="/register" color="inherit">
               Sign up
             </Button>
-            <Button component={Link} href="/login" variant="contained" color="primary">
+            <Button
+              component={Link}
+              href="/login"
+              variant="contained"
+              color="primary"
+            >
               Log in
             </Button>
           </Box>

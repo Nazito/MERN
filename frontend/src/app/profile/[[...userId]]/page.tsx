@@ -1,25 +1,15 @@
 "use client";
 
-<<<<<<< Updated upstream
-import { useEffect, useState } from "react";
-import { useParams } from "next/navigation";
-=======
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
->>>>>>> Stashed changes
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import Avatar from "@mui/material/Avatar";
 import Paper from "@mui/material/Paper";
-<<<<<<< Updated upstream
-import TextField from "@mui/material/TextField";
-import Button from "@mui/material/Button";
-=======
 import Button from "@mui/material/Button";
 import Tabs from "@mui/material/Tabs";
 import Tab from "@mui/material/Tab";
->>>>>>> Stashed changes
 import CircularProgress from "@mui/material/CircularProgress";
 import Stack from "@mui/material/Stack";
 import Card from "@mui/material/Card";
@@ -29,15 +19,11 @@ import PersonAddAlt1Icon from "@mui/icons-material/PersonAddAlt1";
 import ChatBubbleOutlineIcon from "@mui/icons-material/ChatBubbleOutline";
 import CheckIcon from "@mui/icons-material/Check";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
-<<<<<<< Updated upstream
-import { addPost, fetchProfile } from "@/store/slices/profileSlice";
-=======
 import { fetchProfile } from "@/store/slices/profileSlice";
 import { addFriend } from "@/store/slices/friendsSlice";
 import { useNotify } from "@/components/providers/NotificationProvider";
 import EditProfileDialog from "@/components/profile/EditProfileDialog";
 import { avatarUrl } from "@/lib/api";
->>>>>>> Stashed changes
 
 export default function ProfilePage() {
   const params = useParams<{ userId?: string | string[] }>();
@@ -47,7 +33,6 @@ export default function ProfilePage() {
   const { profile, posts, status } = useAppSelector((s) => s.profile);
   const friends = useAppSelector((s) => s.friends.friends);
   const auth = useAppSelector((s) => s.auth);
-  const [text, setText] = useState("");
 
   const [tab, setTab] = useState(0);
   const [editOpen, setEditOpen] = useState(false);
@@ -65,14 +50,8 @@ export default function ProfilePage() {
     }
   }, [dispatch, targetId]);
 
-<<<<<<< Updated upstream
-  const onPublish = () => {
-    const value = text.trim();
-    if (!value) return;
-    dispatch(addPost(value));
-    setText("");
-=======
-  const displayName = profile?.name || (isOwnProfile ? auth.name : null) || "Profile";
+  const displayName =
+    profile?.name || (isOwnProfile ? auth.name : null) || "Profile";
   const bio = profile?.bio?.trim() || "";
   const photo = avatarUrl(profile?.avatar || auth.currentUser?.avatar);
 
@@ -91,7 +70,6 @@ export default function ProfilePage() {
   const onMessage = () => {
     info("Opening messages");
     router.push("/message");
->>>>>>> Stashed changes
   };
 
   return (
@@ -224,27 +202,6 @@ export default function ProfilePage() {
         )}
       </Box>
 
-<<<<<<< Updated upstream
-      <Box p={2.5} borderTop="1px solid" borderColor="divider">
-        <Typography variant="h5" gutterBottom>
-          Posts
-        </Typography>
-        <Paper variant="outlined" sx={{ p: 2, mb: 2, bgcolor: "grey.50" }}>
-          <TextField
-            fullWidth
-            multiline
-            minRows={2}
-            placeholder="What is on your mind?"
-            value={text}
-            onChange={(e) => setText(e.target.value)}
-          />
-          <Box mt={1.5}>
-            <Button variant="contained" onClick={onPublish}>
-              Publish
-            </Button>
-          </Box>
-        </Paper>
-=======
       <Box borderTop="1px solid" borderColor="divider">
         <Tabs
           value={tab}
@@ -254,7 +211,6 @@ export default function ProfilePage() {
           <Tab label="Posts" />
           <Tab label="Friends" />
         </Tabs>
->>>>>>> Stashed changes
 
         <Box p={{ xs: 2, md: 2.5 }}>
           {tab === 0 && (
