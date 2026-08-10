@@ -2,6 +2,11 @@
   "jwtSecret": "your-secret-here",
   "mongoUri": "mongodb+srv://USER:PASSWORD@cluster0.xxxxx.mongodb.net/app?retryWrites=true&w=majority",
   "clientUrl": "http://localhost:3000",
+  "cloudinary": {
+    "cloudName": "your-cloud-name",
+    "apiKey": "your-api-key",
+    "apiSecret": "your-api-secret"
+  },
   "mail": {
     "host": "smtp.gmail.com",
     "port": 587,

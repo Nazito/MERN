@@ -1,9 +1,9 @@
 const fileService = require('../services/fileService')
+const cloudinaryService = require('../services/cloudinaryService')
 const User = require('../models/User')
 const File = require('../models/File')
 const config = require('config')
 const fs = require('fs')
-const Uuid = require('uuid')
 
 class FileController {
 
@@ -174,14 +174,30 @@ class FileController {
 
   async uploadAvatar(req, res){
     try{
+      if (!req.files || !req.files.file) {
+        return res.status(400).json({ message: 'No file uploaded' })
+      }
+
       const file = req.files.file
       const user = await User.findById(req.user.userId).exec()
-      const avatarName = Uuid.v4() + ".jpg"
-      file.mv(config.get('staticPath') + '/' + avatarName )
-      user.avatar = avatarName
+      if (!user) {
+        return res.status(404).json({ message: 'User not found' })
+      }
+
+      const uploaded = await cloudinaryService.uploadAvatarFile(file)
+
+      // Remove previous Cloudinary asset
+      await cloudinaryService.deleteAvatarAsset(user.avatarPublicId)
+
+      user.avatar = uploaded.url
+      user.avatarPublicId = uploaded.publicId
       await user.save()
 
-      return res.json(user)
+      const safe = user.toObject()
+      delete safe.password
+      delete safe.resetPasswordToken
+      delete safe.resetPasswordExpires
+      return res.json(safe)
 
     }catch(e){
       console.log(e)
@@ -192,11 +208,21 @@ class FileController {
   async deleteAvatar(req, res){
     try{
       const user = await User.findById(req.user.userId).exec()
-      fs.unlinkSync(config.get('staticPath') + '/' + user.avatar)
+      if (!user) {
+        return res.status(404).json({ message: 'User not found' })
+      }
+
+      await cloudinaryService.deleteAvatarAsset(user.avatarPublicId)
+
       user.avatar = null
+      user.avatarPublicId = undefined
       await user.save()
 
-      return res.json(user)
+      const safe = user.toObject()
+      delete safe.password
+      delete safe.resetPasswordToken
+      delete safe.resetPasswordExpires
+      return res.json(safe)
 
     }catch(e){
       console.log(e)

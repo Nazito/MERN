@@ -1,89 +1,72 @@
 const {Router} = require('express')
-const config = require('config')
 const User = require('../models/User')
 const router = Router()
-const fs = require('fs')
-const ObjectID = require("mongodb").ObjectID
+const ObjectID = require('mongodb').ObjectID
 const authMiddleware = require('../middleware/auth.middleware')
 
+function publicProfile(user) {
+  if (!user) return null
+  const obj = typeof user.toObject === 'function' ? user.toObject() : { ...user }
+  delete obj.password
+  delete obj.resetPasswordToken
+  delete obj.resetPasswordExpires
+  delete obj.__v
+  return obj
+}
 
-// /api/profile
-router.get(
-  '/profile/:id', 
-  async (req, res)=>{
-    try{
-      const userId = req.params.id
+// /api/profile/:id
+router.get('/profile/:id', async (req, res) => {
+  try {
+    const userId = req.params.id
 
-      if(!ObjectID.isValid(userId)){
-        return res.status(400).json({
-          message: "пользователь не найден"
-        })
-      }
-
-      const user = await User.findById(userId).exec()
-
-      res.json(user)
-
-    }catch(e){
-      res.status(500).json({message: "что-то пошло не так profile page"})
-    }
-
-  })
-
-
-router.post(
-  '/avatar', 
-  authMiddleware,
-  async (req, res)=>{
-    try{
-      const file = req.files.file
-      const parent = await File.findOne( {user: req.user.id, _id: req.body.parent} )
-      const user = await User.findOne({_id: req.user.id})
-
-      if(user.usedSpace + file.size > user.diskSpace){
-        return res.status(400).json({
-          message: "нет места на диске"
-        })
-      }
-
-      user.usedSpace = user.usedSpace + file.size
-
-      let path;
-
-      if (parent){
-        path = `${config.get('filePath')}\\${user._id}\\${parent.path}\\${file.name}`
-      }else{
-        path = `${config.get('filePath')}\\${user._id}\\${file.name}`
-      }
-
-      if(fs.existsSync(path)){
-        return res.status(400).json({
-          message: "такой файл уже существует"
-        })
-      }
-
-      file.mv(path)
-
-      const type = file.name.split('.').pop()
-      const dbFile = new File({
-        name: file.name,
-        type,
-        size: file.size,
-        path: parent.path,
-        parent: parent._id,
-        user: user._id
+    if (!ObjectID.isValid(userId)) {
+      return res.status(400).json({
+        message: 'User not found',
       })
-
-      await dbFile.save()
-      await user.save()
-
-
-      res.json(dbFile)
-
-    }catch(e){
-      res.status(500).json({message: "что-то пошло не так avatar"})
     }
 
-  })
+    const user = await User.findById(userId)
+      .select('-password -resetPasswordToken -resetPasswordExpires')
+      .exec()
+
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' })
+    }
+
+    res.json(publicProfile(user))
+  } catch (e) {
+    res.status(500).json({ message: 'Could not load profile' })
+  }
+})
+
+// /api/profile  (update own profile)
+router.patch('/profile', authMiddleware, async (req, res) => {
+  try {
+    const user = await User.findById(req.user.userId)
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' })
+    }
+
+    const { name, bio } = req.body
+
+    if (typeof name === 'string') {
+      const trimmed = name.trim()
+      if (trimmed.length < 2) {
+        return res.status(400).json({ message: 'Name must be at least 2 characters' })
+      }
+      user.name = trimmed
+    }
+
+    if (typeof bio === 'string') {
+      user.bio = bio.trim().slice(0, 160)
+    }
+
+    await user.save()
+    res.json(publicProfile(user))
+  } catch (e) {
+    console.error(e)
+    res.status(500).json({ message: 'Could not update profile' })
+  }
+})
 
 module.exports = router

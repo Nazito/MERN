@@ -53,12 +53,23 @@ export const usersAPI = {
 
 export const profileAPI = {
   getProfile: (userId: string) => api.get(`/api/profile/${userId}`),
+  updateProfile: (data: { name?: string; bio?: string }) =>
+    api.patch("/api/profile", data),
   uploadAvatar: (formData: FormData) =>
     api.post("/api/files/avatar", formData, {
       headers: { "Content-Type": "multipart/form-data" },
     }),
   deleteAvatar: () => api.delete("/api/files/avatar"),
 };
+
+export function avatarUrl(avatar?: string | null) {
+  if (!avatar) return undefined;
+  // Cloudinary (or any absolute URL). Legacy local filenames are ignored.
+  if (avatar.startsWith("http://") || avatar.startsWith("https://")) {
+    return avatar;
+  }
+  return undefined;
+}
 
 export const filesAPI = {
   getFiles: (url = "") => api.get(`/api/files${url}`),

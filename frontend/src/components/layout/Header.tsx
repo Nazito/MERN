@@ -9,10 +9,25 @@ import Avatar from "@mui/material/Avatar";
 import Box from "@mui/material/Box";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { logout } from "@/store/slices/authSlice";
+import { avatarUrl } from "@/lib/api";
 
 export default function Header() {
   const dispatch = useAppDispatch();
+<<<<<<< Updated upstream
   const { isAuth, name } = useAppSelector((s) => s.auth);
+=======
+  const { isAuth, name, currentUser } = useAppSelector((s) => s.auth);
+  const photo = avatarUrl(currentUser?.avatar);
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const menuOpen = Boolean(anchorEl);
+
+  const closeMenu = () => setAnchorEl(null);
+
+  const handleLogout = () => {
+    closeMenu();
+    dispatch(logout());
+  };
+>>>>>>> Stashed changes
 
   return (
     <AppBar
@@ -53,6 +68,7 @@ export default function Header() {
         </Box>
 
         {isAuth ? (
+<<<<<<< Updated upstream
           <Box display="flex" alignItems="center" gap={1.25}>
             <Avatar sx={{ width: 36, height: 36 }}>
               {(name || "U").slice(0, 1).toUpperCase()}
@@ -62,6 +78,107 @@ export default function Header() {
               Log out
             </Button>
           </Box>
+=======
+          <>
+            <IconButton
+              onClick={(e) => setAnchorEl(e.currentTarget)}
+              size="small"
+              aria-label="Account menu"
+              aria-controls={menuOpen ? "account-menu" : undefined}
+              aria-haspopup="true"
+              aria-expanded={menuOpen ? "true" : undefined}
+              sx={{
+                gap: 0.75,
+                borderRadius: 3,
+                px: 0.75,
+                py: 0.5,
+                border: "1px solid",
+                borderColor: menuOpen ? "primary.main" : "divider",
+                bgcolor: menuOpen ? "action.hover" : "transparent",
+                "&:hover": { bgcolor: "action.hover" },
+              }}
+            >
+              <Avatar
+                src={photo}
+                sx={{ width: 32, height: 32, fontSize: 14, bgcolor: "primary.main" }}
+              >
+                {(name || "U").slice(0, 1).toUpperCase()}
+              </Avatar>
+              <Typography
+                variant="subtitle2"
+                sx={{ display: { xs: "none", sm: "block" }, pr: 0.25 }}
+              >
+                {name}
+              </Typography>
+              <KeyboardArrowDownIcon
+                fontSize="small"
+                sx={{
+                  color: "text.secondary",
+                  transform: menuOpen ? "rotate(180deg)" : "none",
+                  transition: "transform 0.15s ease",
+                }}
+              />
+            </IconButton>
+
+            <Menu
+              id="account-menu"
+              anchorEl={anchorEl}
+              open={menuOpen}
+              onClose={closeMenu}
+              onClick={closeMenu}
+              transformOrigin={{ horizontal: "right", vertical: "top" }}
+              anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
+              PaperProps={{
+                elevation: 0,
+                sx: {
+                  mt: 1,
+                  minWidth: 220,
+                  borderRadius: 3,
+                  border: "1px solid",
+                  borderColor: "divider",
+                  boxShadow: "0 12px 32px rgba(21, 32, 43, 0.12)",
+                },
+              }}
+            >
+              <Box px={2} py={1.25} display="flex" alignItems="center" gap={1.25}>
+                <Avatar
+                  src={photo}
+                  sx={{ width: 40, height: 40, bgcolor: "primary.main" }}
+                >
+                  {(name || "U").slice(0, 1).toUpperCase()}
+                </Avatar>
+                <Box minWidth={0}>
+                  <Typography variant="subtitle2" noWrap>
+                    {name}
+                  </Typography>
+                  <Typography variant="caption" color="text.secondary">
+                    Your account
+                  </Typography>
+                </Box>
+              </Box>
+              <Divider />
+              <MenuItem component={Link} href="/profile">
+                <ListItemIcon>
+                  <PersonOutlineIcon fontSize="small" />
+                </ListItemIcon>
+                View profile
+              </MenuItem>
+              <MenuItem component={Link} href="/settings">
+                <ListItemIcon>
+                  <SettingsOutlinedIcon fontSize="small" />
+                </ListItemIcon>
+                Settings
+              </MenuItem>
+              <Divider />
+              <MenuItem onClick={handleLogout}>
+                <ListItemIcon>
+                  <LogoutIcon fontSize="small" />
+                </ListItemIcon>
+                Log out
+              </MenuItem>
+            </Menu>
+          </>
+>>>>>>> Stashed changes
         ) : (
           <Box display="flex" alignItems="center" gap={1}>
             <Button component={Link} href="/register" color="inherit">
