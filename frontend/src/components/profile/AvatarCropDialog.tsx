@@ -53,7 +53,7 @@ export default function AvatarCropDialog({
       onClose={applying ? undefined : onClose}
       fullWidth
       maxWidth="sm"
-      PaperProps={{ sx: { borderRadius: 4 } }}
+      PaperProps={{ sx: { borderRadius: 2 } }}
     >
       <DialogTitle>Adjust photo</DialogTitle>
       <DialogContent>
@@ -62,7 +62,7 @@ export default function AvatarCropDialog({
           width="100%"
           height={320}
           bgcolor="grey.900"
-          borderRadius={3}
+          borderRadius={1.5}
           overflow="hidden"
         >
           {imageSrc && (

@@ -6,6 +6,7 @@ import { ThemeProvider } from "@mui/material/styles";
 import CssBaseline from "@mui/material/CssBaseline";
 import theme from "@/lib/theme";
 import { NotificationProvider } from "@/components/providers/NotificationProvider";
+import SocketProvider from "@/components/providers/SocketProvider";
 
 export default function ThemeRegistry({
   children,
@@ -16,7 +17,9 @@ export default function ThemeRegistry({
     <AppRouterCacheProvider>
       <ThemeProvider theme={theme}>
         <CssBaseline />
-        <NotificationProvider>{children}</NotificationProvider>
+        <NotificationProvider>
+          <SocketProvider>{children}</SocketProvider>
+        </NotificationProvider>
       </ThemeProvider>
     </AppRouterCacheProvider>
   );

@@ -1,0 +1,35 @@
+import { io, Socket } from "socket.io-client";
+
+const SOCKET_URL =
+  process.env.NEXT_PUBLIC_SOCKET_URL || "http://localhost:5001";
+
+let socket: Socket | null = null;
+
+export function getSocket() {
+  return socket;
+}
+
+export function connectSocket(token: string) {
+  if (socket?.connected) {
+    return socket;
+  }
+
+  if (socket) {
+    socket.disconnect();
+  }
+
+  socket = io(SOCKET_URL, {
+    auth: { token },
+    transports: ["websocket", "polling"],
+    autoConnect: true,
+  });
+
+  return socket;
+}
+
+export function disconnectSocket() {
+  if (socket) {
+    socket.disconnect();
+    socket = null;
+  }
+}

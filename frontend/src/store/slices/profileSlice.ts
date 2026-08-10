@@ -7,6 +7,7 @@ export type Profile = {
   email?: string;
   bio?: string;
   avatar?: string;
+  friendsCount?: number;
 };
 
 type ProfileState = {

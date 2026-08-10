@@ -34,12 +34,24 @@ const theme = createTheme({
     h6: { fontFamily: '"Fraunces", Georgia, serif', fontWeight: 700 },
     button: { textTransform: "none", fontWeight: 600 },
   },
-  shape: { borderRadius: 12 },
+  shape: { borderRadius: 8 },
   components: {
     MuiButton: {
       defaultProps: { disableElevation: true },
       styleOverrides: {
-        root: { borderRadius: 999 },
+        root: { borderRadius: 8 },
+        sizeSmall: { borderRadius: 6 },
+      },
+    },
+    MuiIconButton: {
+      styleOverrides: {
+        root: { borderRadius: 8 },
+        sizeSmall: { borderRadius: 6 },
+      },
+    },
+    MuiChip: {
+      styleOverrides: {
+        root: { borderRadius: 6 },
       },
     },
     MuiCard: {
@@ -47,12 +59,13 @@ const theme = createTheme({
         root: {
           border: "1px solid #d9e0e6",
           boxShadow: "none",
+          borderRadius: 8,
         },
       },
     },
     MuiPaper: {
       styleOverrides: {
-        rounded: { borderRadius: 16 },
+        rounded: { borderRadius: 8 },
         elevation1: {
           boxShadow: "0 10px 30px rgba(21, 32, 43, 0.06)",
         },
@@ -60,7 +73,24 @@ const theme = createTheme({
     },
     MuiListItemButton: {
       styleOverrides: {
-        root: { borderRadius: 12 },
+        root: { borderRadius: 8 },
+      },
+    },
+    MuiDialog: {
+      styleOverrides: {
+        paper: { borderRadius: 12 },
+      },
+    },
+    MuiMenu: {
+      styleOverrides: {
+        paper: { borderRadius: 8 },
+      },
+    },
+    MuiTextField: {
+      styleOverrides: {
+        root: {
+          "& .MuiOutlinedInput-root": { borderRadius: 8 },
+        },
       },
     },
   },

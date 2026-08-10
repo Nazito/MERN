@@ -62,6 +62,17 @@ export const profileAPI = {
   deleteAvatar: () => api.delete("/api/files/avatar"),
 };
 
+export const friendsAPI = {
+  list: () => api.get("/api/friends"),
+  ofUser: (userId: string) => api.get(`/api/friends/of/${userId}`),
+  requests: () => api.get("/api/friends/requests"),
+  status: (userId: string) => api.get(`/api/friends/status/${userId}`),
+  sendRequest: (userId: string) => api.post(`/api/friends/${userId}`),
+  accept: (userId: string) => api.post(`/api/friends/${userId}/accept`),
+  decline: (userId: string) => api.post(`/api/friends/${userId}/decline`),
+  remove: (userId: string) => api.delete(`/api/friends/${userId}`),
+};
+
 export function avatarUrl(avatar?: string | null) {
   if (!avatar) return undefined;
   // Cloudinary (or any absolute URL). Legacy local filenames are ignored.

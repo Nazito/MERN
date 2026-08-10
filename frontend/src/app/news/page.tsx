@@ -96,7 +96,7 @@ export default function NewsPage() {
         sx={{
           p: 2,
           mb: 2,
-          borderRadius: 4,
+          borderRadius: 2,
           border: "1px solid",
           borderColor: "divider",
           bgcolor: "grey.50",
@@ -117,7 +117,7 @@ export default function NewsPage() {
               sx={{
                 "& .MuiOutlinedInput-root": {
                   bgcolor: "background.paper",
-                  borderRadius: 3,
+                  borderRadius: 1.5,
                 },
               }}
             />
@@ -136,7 +136,7 @@ export default function NewsPage() {
 
       <Box display="grid" gap={1.75}>
         {feed.map((item) => (
-          <Card key={item.id} variant="outlined" sx={{ borderRadius: 4 }}>
+          <Card key={item.id} variant="outlined" sx={{ borderRadius: 2 }}>
             <CardHeader
               avatar={<Avatar>{item.initials}</Avatar>}
               title={item.author}

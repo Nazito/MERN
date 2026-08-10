@@ -3,6 +3,7 @@ const User = require('../models/User')
 const router = Router()
 const ObjectID = require('mongodb').ObjectID
 const authMiddleware = require('../middleware/auth.middleware')
+const { friendsCountFor } = require('../services/friendsService')
 
 function publicProfile(user) {
   if (!user) return null
@@ -33,7 +34,9 @@ router.get('/profile/:id', async (req, res) => {
       return res.status(404).json({ message: 'User not found' })
     }
 
-    res.json(publicProfile(user))
+    const profile = publicProfile(user)
+    profile.friendsCount = await friendsCountFor(userId)
+    res.json(profile)
   } catch (e) {
     res.status(500).json({ message: 'Could not load profile' })
   }

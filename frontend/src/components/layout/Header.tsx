@@ -20,6 +20,7 @@ import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { logout } from "@/store/slices/authSlice";
 import { avatarUrl } from "@/lib/api";
+import NotificationsBell from "@/components/layout/NotificationsBell";
 
 export default function Header() {
   const dispatch = useAppDispatch();
@@ -40,7 +41,7 @@ export default function Header() {
       position="static"
       elevation={0}
       sx={{
-        borderRadius: 4,
+        borderRadius: 2,
         border: "1px solid",
         borderColor: "divider",
         bgcolor: "rgba(255,255,255,0.92)",
@@ -55,7 +56,7 @@ export default function Header() {
             sx={{
               width: 38,
               height: 38,
-              borderRadius: 3,
+              borderRadius: 1.5,
               bgcolor: "primary.main",
               fontFamily: '"Fraunces", Georgia, serif',
               fontWeight: 700,
@@ -74,7 +75,8 @@ export default function Header() {
         </Box>
 
         {isAuth ? (
-          <>
+          <Box display="flex" alignItems="center" gap={1}>
+            <NotificationsBell />
             <IconButton
               onClick={(e) => setAnchorEl(e.currentTarget)}
               size="small"
@@ -84,7 +86,7 @@ export default function Header() {
               aria-expanded={menuOpen ? "true" : undefined}
               sx={{
                 gap: 0.75,
-                borderRadius: 3,
+                borderRadius: 1.5,
                 px: 0.75,
                 py: 0.5,
                 border: "1px solid",
@@ -128,7 +130,7 @@ export default function Header() {
                 sx: {
                   mt: 1,
                   minWidth: 220,
-                  borderRadius: 3,
+                  borderRadius: 1.5,
                   border: "1px solid",
                   borderColor: "divider",
                   boxShadow: "0 12px 32px rgba(21, 32, 43, 0.12)",
@@ -172,7 +174,7 @@ export default function Header() {
                 Log out
               </MenuItem>
             </Menu>
-          </>
+          </Box>
         ) : (
           <Box display="flex" alignItems="center" gap={1}>
             <Button component={Link} href="/register" color="inherit">

@@ -42,7 +42,7 @@ export default function MessagesPage() {
         </Typography>
         <List disablePadding>
           {dialogs.map((d) => (
-            <ListItemButton key={d.id} sx={{ borderRadius: 3, mb: 0.5 }}>
+            <ListItemButton key={d.id} sx={{ borderRadius: 1.5, mb: 0.5 }}>
               <ListItemAvatar>
                 <Avatar>{d.name.slice(0, 1)}</Avatar>
               </ListItemAvatar>
@@ -76,7 +76,7 @@ export default function MessagesPage() {
                 maxWidth: "70%",
                 width: "fit-content",
                 p: 1.5,
-                borderRadius: "16px 16px 16px 4px",
+                borderRadius: "10px 10px 10px 4px",
                 bgcolor: "#e7f6f2",
               }}
             >
