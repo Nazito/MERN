@@ -73,6 +73,20 @@ export const friendsAPI = {
   remove: (userId: string) => api.delete(`/api/friends/${userId}`),
 };
 
+export const messagesAPI = {
+  conversations: () => api.get("/api/messages/conversations"),
+  openConversation: (userId: string) =>
+    api.post("/api/messages/conversations", { userId }),
+  getConversation: (id: string) =>
+    api.get(`/api/messages/conversations/${id}`),
+  messages: (conversationId: string) =>
+    api.get(`/api/messages/conversations/${conversationId}/messages`),
+  send: (conversationId: string, text: string) =>
+    api.post(`/api/messages/conversations/${conversationId}/messages`, {
+      text,
+    }),
+};
+
 export function avatarUrl(avatar?: string | null) {
   if (!avatar) return undefined;
   // Cloudinary (or any absolute URL). Legacy local filenames are ignored.

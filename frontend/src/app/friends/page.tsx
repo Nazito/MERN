@@ -229,6 +229,14 @@ export default function FriendsPage() {
                       </Button>
                       <Button
                         size="small"
+                        variant="contained"
+                        component={Link}
+                        href={`/message?userId=${f._id}`}
+                      >
+                        Message
+                      </Button>
+                      <Button
+                        size="small"
                         color="inherit"
                         disabled={busy}
                         onClick={() => onRemove(f._id)}

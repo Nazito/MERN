@@ -23,11 +23,12 @@ import PeopleOutlineIcon from "@mui/icons-material/PeopleOutline";
 import LibraryMusicIcon from "@mui/icons-material/LibraryMusic";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { fetchUsers } from "@/store/slices/usersSlice";
+import { selectUnreadTotal } from "@/store/slices/messagesSlice";
 import { avatarUrl } from "@/lib/api";
 
 const links = [
   { href: "/news", label: "Feed", icon: HomeIcon },
-  { href: "/message", label: "Messages", icon: ChatBubbleIcon },
+  { href: "/message", label: "Messages", icon: ChatBubbleIcon, badgeKey: "messages" as const },
   { href: "/friends", label: "Friends", icon: PeopleOutlineIcon, badgeKey: "requests" as const },
   { href: "/users", label: "People", icon: PeopleIcon },
   { href: "/music", label: "Music", icon: LibraryMusicIcon },
@@ -41,6 +42,7 @@ export default function Sidebar() {
   const { users, status } = useAppSelector((s) => s.users);
   const currentUserId = useAppSelector((s) => s.auth.currentUser?.userId);
   const requestCount = useAppSelector((s) => s.friends.requests.length);
+  const unreadMessages = useAppSelector(selectUnreadTotal);
 
   useEffect(() => {
     if (status === "idle") {
@@ -64,7 +66,7 @@ export default function Sidebar() {
         borderRadius: 2,
         boxShadow: "0 10px 30px rgba(21, 32, 43, 0.06)",
         height: "fit-content",
-        position: { md: "sticky" },
+        position: { md: "static" },
         top: 16,
         bgcolor: "rgba(255,255,255,0.94)",
       }}
@@ -75,8 +77,12 @@ export default function Sidebar() {
           const selected =
             pathname === link.href || pathname.startsWith(link.href + "/");
           const badge =
-            "badgeKey" in link && link.badgeKey === "requests"
-              ? requestCount
+            "badgeKey" in link
+              ? link.badgeKey === "requests"
+                ? requestCount
+                : link.badgeKey === "messages"
+                  ? unreadMessages
+                  : 0
               : 0;
           return (
             <ListItemButton
