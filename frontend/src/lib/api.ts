@@ -94,6 +94,16 @@ export const messagesAPI = {
     }),
 };
 
+export const postsAPI = {
+  feed: () => api.get("/api/posts"),
+  byUser: (userId: string) => api.get(`/api/posts/user/${userId}`),
+  create: (text: string) => api.post("/api/posts", { text }),
+  update: (id: string, text: string) =>
+    api.patch(`/api/posts/${id}`, { text }),
+  remove: (id: string) => api.delete(`/api/posts/${id}`),
+  toggleLike: (id: string) => api.post(`/api/posts/${id}/like`),
+};
+
 export function avatarUrl(avatar?: string | null) {
   if (!avatar) return undefined;
   // Cloudinary (or any absolute URL). Legacy local filenames are ignored.

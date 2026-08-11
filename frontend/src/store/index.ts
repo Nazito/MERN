@@ -5,6 +5,7 @@ import usersReducer from "./slices/usersSlice";
 import messagesReducer from "./slices/messagesSlice";
 import friendsReducer from "./slices/friendsSlice";
 import profileReducer from "./slices/profileSlice";
+import postsReducer from "./slices/postsSlice";
 
 export const makeStore = () =>
   configureStore({
@@ -15,6 +16,7 @@ export const makeStore = () =>
       messages: messagesReducer,
       friends: friendsReducer,
       profile: profileReducer,
+      posts: postsReducer,
     },
     devTools: process.env.NODE_ENV !== "production",
   });
