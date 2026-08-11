@@ -26,10 +26,22 @@ import { fetchUsers } from "@/store/slices/usersSlice";
 import { selectUnreadTotal } from "@/store/slices/messagesSlice";
 import { avatarUrl } from "@/lib/api";
 
-const links = [
+const allLinks = [
   { href: "/news", label: "Feed", icon: HomeIcon },
-  { href: "/message", label: "Messages", icon: ChatBubbleIcon, badgeKey: "messages" as const },
-  { href: "/friends", label: "Friends", icon: PeopleOutlineIcon, badgeKey: "requests" as const },
+  {
+    href: "/message",
+    label: "Messages",
+    icon: ChatBubbleIcon,
+    badgeKey: "messages" as const,
+    authOnly: true,
+  },
+  {
+    href: "/friends",
+    label: "Friends",
+    icon: PeopleOutlineIcon,
+    badgeKey: "requests" as const,
+    authOnly: true,
+  },
   { href: "/users", label: "People", icon: PeopleIcon },
   { href: "/music", label: "Music", icon: LibraryMusicIcon },
 ];
@@ -43,6 +55,12 @@ export default function Sidebar() {
   const currentUserId = useAppSelector((s) => s.auth.currentUser?.userId);
   const requestCount = useAppSelector((s) => s.friends.requests.length);
   const unreadMessages = useAppSelector(selectUnreadTotal);
+  const isAuth = useAppSelector((s) => s.auth.isAuth);
+
+  const links = useMemo(
+    () => allLinks.filter((link) => !("authOnly" in link && link.authOnly) || isAuth),
+    [isAuth]
+  );
 
   useEffect(() => {
     if (status === "idle") {

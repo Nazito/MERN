@@ -25,6 +25,7 @@ import { setAuthProfile } from "@/store/slices/authSlice";
 import { useNotify } from "@/components/providers/NotificationProvider";
 import { avatarUrl } from "@/lib/api";
 import AvatarCropDialog from "@/components/profile/AvatarCropDialog";
+import { useSession } from "next-auth/react";
 
 type EditProfileDialogProps = {
   open: boolean;
@@ -38,6 +39,7 @@ export default function EditProfileDialog({
   profile,
 }: EditProfileDialogProps) {
   const dispatch = useAppDispatch();
+  const { update: updateSession } = useSession();
   const authName = useAppSelector((s) => s.auth.name);
   const updateStatus = useAppSelector((s) => s.profile.updateStatus);
   const { success } = useNotify();
@@ -79,6 +81,10 @@ export default function EditProfileDialog({
           avatar: result.payload.avatar,
         })
       );
+      await updateSession({
+        name: result.payload.name,
+        avatar: result.payload.avatar ?? null,
+      });
       success("Profile updated");
       onClose();
     }
@@ -109,6 +115,10 @@ export default function EditProfileDialog({
             avatar: result.payload.avatar,
           })
         );
+        await updateSession({
+          name: result.payload.name,
+          avatar: result.payload.avatar ?? null,
+        });
         success("Avatar updated");
       }
     } finally {
@@ -123,6 +133,7 @@ export default function EditProfileDialog({
       if (deleteAvatar.fulfilled.match(result)) {
         setPreviewAvatar(undefined);
         dispatch(setAuthProfile({ avatar: null }));
+        await updateSession({ avatar: null });
         success("Avatar removed");
       }
     } finally {

@@ -21,6 +21,8 @@ import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { logout } from "@/store/slices/authSlice";
 import { avatarUrl } from "@/lib/api";
 import NotificationsBell from "@/components/layout/NotificationsBell";
+import { signOut } from "next-auth/react";
+import { setAccessTokenCache } from "@/lib/sessionToken";
 
 export default function Header() {
   const dispatch = useAppDispatch();
@@ -31,9 +33,11 @@ export default function Header() {
 
   const closeMenu = () => setAnchorEl(null);
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
     closeMenu();
     dispatch(logout());
+    setAccessTokenCache(null);
+    await signOut({ callbackUrl: "/login" });
   };
 
   return (

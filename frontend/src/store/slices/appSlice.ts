@@ -1,7 +1,4 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import { fetchMe } from "./authSlice";
-import { fetchFriendRequests } from "./friendsSlice";
-import { fetchConversations } from "./messagesSlice";
 
 type AppState = {
   initialized: boolean;
@@ -11,18 +8,10 @@ const initialState: AppState = {
   initialized: false,
 };
 
-export const initializeApp = createAsyncThunk(
-  "app/initialize",
-  async (_, { dispatch }) => {
-    const me = await dispatch(fetchMe());
-    if (fetchMe.fulfilled.match(me) && me.payload) {
-      await Promise.all([
-        dispatch(fetchFriendRequests()),
-        dispatch(fetchConversations()),
-      ]);
-    }
-  }
-);
+/** Bootstrap flag — auth/data load via NextAuth SessionSync */
+export const initializeApp = createAsyncThunk("app/initialize", async () => {
+  return true;
+});
 
 const appSlice = createSlice({
   name: "app",

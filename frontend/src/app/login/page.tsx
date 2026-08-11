@@ -1,8 +1,9 @@
 "use client";
 
-import { useEffect } from "react";
+import { Suspense, useEffect, useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
+import { signIn, useSession } from "next-auth/react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Box from "@mui/material/Box";
@@ -12,15 +13,19 @@ import CardActions from "@mui/material/CardActions";
 import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
 import MuiLink from "@mui/material/Link";
+import Alert from "@mui/material/Alert";
+import CircularProgress from "@mui/material/CircularProgress";
 import FormTextField from "@/components/ui/FormTextField";
-import { useAppDispatch, useAppSelector } from "@/store/hooks";
-import { login } from "@/store/slices/authSlice";
 import { loginSchema, LoginFormValues } from "@/lib/validation/auth";
 
-export default function LoginPage() {
-  const dispatch = useAppDispatch();
+function LoginForm() {
   const router = useRouter();
-  const { isAuth } = useAppSelector((s) => s.auth);
+  const searchParams = useSearchParams();
+  const { status } = useSession();
+  const [error, setError] = useState<string | null>(null);
+  const [submitting, setSubmitting] = useState(false);
+
+  const callbackUrl = searchParams.get("callbackUrl") || "/news";
 
   const { control, handleSubmit } = useForm<LoginFormValues>({
     resolver: zodResolver(loginSchema),
@@ -29,13 +34,35 @@ export default function LoginPage() {
   });
 
   useEffect(() => {
-    if (isAuth) router.replace("/news");
-  }, [isAuth, router]);
+    if (status === "authenticated") {
+      router.replace(callbackUrl);
+    }
+  }, [status, router, callbackUrl]);
 
   const onSubmit = handleSubmit(async (values) => {
-    const result = await dispatch(login(values));
-    if (login.fulfilled.match(result)) {
-      router.push("/news");
+    setError(null);
+    setSubmitting(true);
+    try {
+      const result = await signIn("credentials", {
+        email: values.email,
+        password: values.password,
+        redirect: false,
+        callbackUrl,
+      });
+
+      if (result?.error) {
+        setError(
+          result.error === "CredentialsSignin"
+            ? "Invalid email or password"
+            : result.error
+        );
+        return;
+      }
+
+      router.push(callbackUrl);
+      router.refresh();
+    } finally {
+      setSubmitting(false);
     }
   });
 
@@ -63,6 +90,11 @@ export default function LoginPage() {
           <Typography variant="h5" gutterBottom>
             Log in
           </Typography>
+          {error && (
+            <Alert severity="error" sx={{ mb: 1.5 }}>
+              {error}
+            </Alert>
+          )}
           <FormTextField
             name="email"
             control={control}
@@ -87,7 +119,12 @@ export default function LoginPage() {
           </Box>
         </CardContent>
         <CardActions sx={{ justifyContent: "space-between", px: 2, pb: 2 }}>
-          <Button type="submit" variant="contained" color="primary">
+          <Button
+            type="submit"
+            variant="contained"
+            color="primary"
+            disabled={submitting}
+          >
             Log in
           </Button>
           <MuiLink component={Link} href="/register" variant="body2">
@@ -96,5 +133,19 @@ export default function LoginPage() {
         </CardActions>
       </Card>
     </Box>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense
+      fallback={
+        <Box py={8} display="flex" justifyContent="center">
+          <CircularProgress size={28} />
+        </Box>
+      }
+    >
+      <LoginForm />
+    </Suspense>
   );
 }
