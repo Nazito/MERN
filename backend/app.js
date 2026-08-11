@@ -14,6 +14,7 @@ app.use(fileUpload({})) //uploads
 app.use('/api/auth', require('./routes/auth.route')) //login/register
 app.use('/api/friends', require('./routes/friends.route'))
 app.use('/api/messages', require('./routes/messages.route'))
+app.use('/api/posts', require('./routes/posts.route'))
 app.use('/api', require('./routes/users.route')) //Пользователи
 app.use('/api', require('./routes/profile.route')) //user
 app.use('/api/files', require('./routes/file.route')) //files

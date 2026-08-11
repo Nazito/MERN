@@ -1,4 +1,4 @@
-import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
+import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import { profileAPI } from "@/lib/api";
 
 export type Profile = {
@@ -12,17 +12,12 @@ export type Profile = {
 
 type ProfileState = {
   profile: Profile | null;
-  posts: Array<{ id: number; message: string; like: number }>;
   status: "idle" | "loading" | "succeeded" | "failed";
   updateStatus: "idle" | "loading" | "succeeded" | "failed";
 };
 
 const initialState: ProfileState = {
   profile: null,
-  posts: [
-    { id: 1, message: "Hi, how are you?", like: 12 },
-    { id: 2, message: "It is my first post", like: 11 },
-  ],
   status: "idle",
   updateStatus: "idle",
 };
@@ -85,15 +80,7 @@ export const deleteAvatar = createAsyncThunk(
 const profileSlice = createSlice({
   name: "profile",
   initialState,
-  reducers: {
-    addPost(state, action: PayloadAction<string>) {
-      state.posts.push({
-        id: Date.now(),
-        message: action.payload,
-        like: 0,
-      });
-    },
-  },
+  reducers: {},
   extraReducers: (builder) => {
     builder
       .addCase(fetchProfile.pending, (state) => {
@@ -132,5 +119,4 @@ const profileSlice = createSlice({
   },
 });
 
-export const { addPost } = profileSlice.actions;
 export default profileSlice.reducer;

@@ -6,7 +6,6 @@ import { useParams, useRouter } from "next/navigation";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import Avatar from "@mui/material/Avatar";
-import Paper from "@mui/material/Paper";
 import Button from "@mui/material/Button";
 import Tabs from "@mui/material/Tabs";
 import Tab from "@mui/material/Tab";
@@ -32,8 +31,10 @@ import {
   removeFriend,
   sendFriendRequest,
 } from "@/store/slices/friendsSlice";
+import { clearWall, fetchUserPosts } from "@/store/slices/postsSlice";
 import { useNotify } from "@/components/providers/NotificationProvider";
 import EditProfileDialog from "@/components/profile/EditProfileDialog";
+import PostCard from "@/components/posts/PostCard";
 import { avatarUrl } from "@/lib/api";
 
 export default function ProfilePage() {
@@ -41,7 +42,9 @@ export default function ProfilePage() {
   const router = useRouter();
   const dispatch = useAppDispatch();
   const { success } = useNotify();
-  const { profile, posts, status } = useAppSelector((s) => s.profile);
+  const { profile, status } = useAppSelector((s) => s.profile);
+  const wallPosts = useAppSelector((s) => s.posts.wall);
+  const wallStatus = useAppSelector((s) => s.posts.wallStatus);
   const profileFriends = useAppSelector((s) => s.friends.profileFriends);
   const statusByUserId = useAppSelector((s) => s.friends.statusByUserId);
   const actionStatus = useAppSelector((s) => s.friends.actionStatus);
@@ -65,6 +68,11 @@ export default function ProfilePage() {
     if (targetId) {
       dispatch(fetchProfile(String(targetId)));
       dispatch(fetchFriendsOfUser(String(targetId)));
+      if (auth.isAuth) {
+        dispatch(fetchUserPosts(String(targetId)));
+      } else {
+        dispatch(clearWall());
+      }
       if (!isOwnProfile && auth.isAuth) {
         dispatch(fetchFriendshipStatus(String(targetId)));
       }
@@ -215,7 +223,7 @@ export default function ProfilePage() {
                   component="span"
                   sx={{ fontWeight: 700, color: "text.primary", mr: 0.5 }}
                 >
-                  {posts.length}
+                  {wallPosts.length}
                 </Box>
                 posts
               </Box>
@@ -315,30 +323,23 @@ export default function ProfilePage() {
         <Box p={{ xs: 2, md: 2.5 }}>
           {tab === 0 && (
             <Box>
-              {[...posts].reverse().map((p) => (
-                <Paper
-                  key={p.id}
-                  variant="outlined"
-                  sx={{ p: 1.75, mb: 1.5, borderRadius: 1.5 }}
-                >
-                  <Box display="flex" gap={1.25} alignItems="flex-start">
-                    <Avatar src={photo} sx={{ width: 40, height: 40 }}>
-                      {displayName.slice(0, 1).toUpperCase()}
-                    </Avatar>
-                    <Box>
-                      <Typography variant="subtitle2">{displayName}</Typography>
-                      <Typography variant="body1" mt={0.5}>
-                        {p.message}
-                      </Typography>
-                      <Typography variant="caption" color="text.secondary">
-                        {p.like} likes
-                      </Typography>
-                    </Box>
-                  </Box>
-                </Paper>
-              ))}
-              {posts.length === 0 && (
-                <Typography color="text.secondary">No posts yet</Typography>
+              {!auth.isAuth ? (
+                <Typography color="text.secondary">
+                  Log in to see posts on this profile.
+                </Typography>
+              ) : wallStatus === "loading" && wallPosts.length === 0 ? (
+                <Box py={3} display="flex" justifyContent="center">
+                  <CircularProgress size={24} />
+                </Box>
+              ) : (
+                <Box display="grid" gap={1.5}>
+                  {wallPosts.map((p) => (
+                    <PostCard key={p._id} post={p} />
+                  ))}
+                  {wallPosts.length === 0 && wallStatus === "succeeded" && (
+                    <Typography color="text.secondary">No posts yet</Typography>
+                  )}
+                </Box>
               )}
             </Box>
           )}
