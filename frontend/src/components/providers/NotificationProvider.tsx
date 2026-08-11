@@ -13,6 +13,7 @@ import Alert from "@mui/material/Alert";
 import Stack from "@mui/material/Stack";
 import {
   setNotificationHandler,
+  notifyFromServer,
   type NotifyOptions,
 } from "@/lib/notificationBus";
 
@@ -80,7 +81,7 @@ export function NotificationProvider({
 
   useEffect(() => {
     setNotificationHandler(value.notify);
-    return () => setNotificationHandler(null);
+    // Do not clear on unmount — Strict Mode would drop toasts during remount
   }, [value.notify]);
 
   return (
@@ -134,10 +135,14 @@ export function NotificationProvider({
   );
 }
 
+const busNotify: NotificationContextValue = {
+  notify: (options) => notifyFromServer(options),
+  success: (message) => notifyFromServer({ message, severity: "success" }),
+  error: (message) => notifyFromServer({ message, severity: "error" }),
+  info: (message) => notifyFromServer({ message, severity: "info" }),
+  warning: (message) => notifyFromServer({ message, severity: "warning" }),
+};
+
 export function useNotify() {
-  const ctx = useContext(NotificationContext);
-  if (!ctx) {
-    throw new Error("useNotify must be used within NotificationProvider");
-  }
-  return ctx;
+  return useContext(NotificationContext) ?? busNotify;
 }

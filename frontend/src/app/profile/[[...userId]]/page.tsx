@@ -40,7 +40,7 @@ export default function ProfilePage() {
   const params = useParams<{ userId?: string | string[] }>();
   const router = useRouter();
   const dispatch = useAppDispatch();
-  const { success, info } = useNotify();
+  const { success } = useNotify();
   const { profile, posts, status } = useAppSelector((s) => s.profile);
   const profileFriends = useAppSelector((s) => s.friends.profileFriends);
   const statusByUserId = useAppSelector((s) => s.friends.statusByUserId);
@@ -123,8 +123,8 @@ export default function ProfilePage() {
   };
 
   const onMessage = () => {
-    info("Opening messages");
-    router.push("/message");
+    if (!targetId) return;
+    router.push(`/message?userId=${targetId}`);
   };
 
   const friendButtonLabel =

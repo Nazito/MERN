@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
+import { usePathname } from "next/navigation";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import {
   fetchFriendRequests,
@@ -8,8 +9,20 @@ import {
   FriendRequest,
   receiveFriendRequest,
 } from "@/store/slices/friendsSlice";
-import { useNotify } from "@/components/providers/NotificationProvider";
-import { connectSocket, disconnectSocket, getSocket } from "@/lib/socket";
+import {
+  Conversation,
+  ChatMessage,
+  receiveMessage,
+  resetMessagesState,
+  setActiveConversation,
+  fetchConversations,
+} from "@/store/slices/messagesSlice";
+import { notifyFromServer } from "@/lib/notificationBus";
+import {
+  connectSocket,
+  disconnectSocket,
+  subscribeSocket,
+} from "@/lib/socket";
 
 function normalizeRequest(payload: FriendRequest): FriendRequest | null {
   if (!payload?.from?._id) return null;
@@ -33,18 +46,44 @@ export default function SocketProvider({
 }) {
   const dispatch = useAppDispatch();
   const isAuth = useAppSelector((s) => s.auth.isAuth);
-  const { info, success } = useNotify();
-  const infoRef = useRef(info);
-  const successRef = useRef(success);
+  const activeId = useAppSelector((s) => s.messages?.activeId ?? null);
+  const pathname = usePathname();
+
+  const activeIdRef = useRef(activeId);
+  const pathnameRef = useRef(pathname);
+  const seenMessageIds = useRef(new Set<string>());
 
   useEffect(() => {
-    infoRef.current = info;
-    successRef.current = success;
-  }, [info, success]);
+    activeIdRef.current = activeId;
+  }, [activeId]);
+
+  useEffect(() => {
+    pathnameRef.current = pathname;
+  }, [pathname]);
+
+  // Leaving Messages should drop "viewing" state so unread works on other pages
+  useEffect(() => {
+    if (!pathname?.startsWith("/message") && activeId) {
+      dispatch(setActiveConversation(null));
+    }
+  }, [pathname, activeId, dispatch]);
+
+  const unreadTotal = useAppSelector((s) => {
+    const map = s.messages?.unreadById || {};
+    return Object.values(map).reduce((sum, n) => sum + (n || 0), 0);
+  });
+
+  useEffect(() => {
+    if (typeof document === "undefined") return;
+    const base = "Circle";
+    document.title = unreadTotal > 0 ? `(${unreadTotal}) ${base}` : base;
+  }, [unreadTotal]);
 
   useEffect(() => {
     if (!isAuth) {
       disconnectSocket();
+      dispatch(resetMessagesState());
+      seenMessageIds.current.clear();
       return;
     }
 
@@ -52,36 +91,97 @@ export default function SocketProvider({
       typeof window !== "undefined" ? localStorage.getItem("token") : null;
     if (!token) return;
 
-    const socket = connectSocket(token);
+    connectSocket(token);
 
-    const onFriendRequest = (raw: FriendRequest) => {
-      const payload = normalizeRequest(raw);
-      if (!payload) {
+    const onEvent = (event: string, raw: unknown) => {
+      if (event === "friend:request") {
+        const payload = normalizeRequest(raw as FriendRequest);
+        if (!payload) {
+          dispatch(fetchFriendRequests());
+          return;
+        }
+        dispatch(receiveFriendRequest(payload));
         dispatch(fetchFriendRequests());
+        notifyFromServer({
+          message: `${payload.from.name || "Someone"} sent you a friend request`,
+          severity: "info",
+        });
         return;
       }
-      dispatch(receiveFriendRequest(payload));
-      dispatch(fetchFriendRequests());
-      infoRef.current(
-        `${payload.from.name || "Someone"} sent you a friend request`
-      );
+
+      if (event === "friend:accepted") {
+        const payload = raw as { by?: { name?: string } };
+        notifyFromServer({
+          message: `${payload?.by?.name || "Someone"} accepted your friend request`,
+          severity: "success",
+        });
+        dispatch(fetchFriends());
+        return;
+      }
+
+      if (event === "message:new") {
+        const payload = raw as {
+          _id: string;
+          conversationId: string;
+          text: string;
+          senderId: string;
+          sender?: ChatMessage["sender"];
+          createdAt?: string;
+          conversation?: Conversation;
+        };
+
+        const messageId = String(payload._id);
+        if (seenMessageIds.current.has(messageId)) return;
+        seenMessageIds.current.add(messageId);
+
+        const conversationId = String(payload.conversationId);
+        const onMessagesPage = Boolean(
+          pathnameRef.current?.startsWith("/message")
+        );
+        const viewingThisChat =
+          onMessagesPage && activeIdRef.current === conversationId;
+
+        dispatch(
+          receiveMessage({
+            message: {
+              _id: messageId,
+              conversationId,
+              text: payload.text,
+              senderId: String(payload.senderId),
+              sender: payload.sender || null,
+              createdAt: payload.createdAt,
+              mine: false,
+            },
+            conversation: payload.conversation,
+            viewing: viewingThisChat,
+          })
+        );
+
+        if (!viewingThisChat) {
+          const name = payload.sender?.name || "Someone";
+          const preview =
+            payload.text.length > 80
+              ? `${payload.text.slice(0, 80)}…`
+              : payload.text;
+          notifyFromServer({
+            message: `${name}: ${preview}`,
+            severity: "info",
+            duration: 5000,
+          });
+        }
+      }
     };
 
-    const onFriendAccepted = (payload: { by?: { name?: string } }) => {
-      successRef.current(
-        `${payload?.by?.name || "Someone"} accepted your friend request`
-      );
-      dispatch(fetchFriends());
-    };
+    const unsubscribe = subscribeSocket(onEvent);
 
-    socket.on("friend:request", onFriendRequest);
-    socket.on("friend:accepted", onFriendAccepted);
+    // Backup poll if socket drops — pick up new previews for badges
+    const pollId = window.setInterval(() => {
+      dispatch(fetchConversations());
+    }, 15000);
 
     return () => {
-      const active = getSocket();
-      active?.off("friend:request", onFriendRequest);
-      active?.off("friend:accepted", onFriendAccepted);
-      disconnectSocket();
+      unsubscribe();
+      window.clearInterval(pollId);
     };
   }, [isAuth, dispatch]);
 

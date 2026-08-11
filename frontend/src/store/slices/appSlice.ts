@@ -1,6 +1,7 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import { fetchMe } from "./authSlice";
 import { fetchFriendRequests } from "./friendsSlice";
+import { fetchConversations } from "./messagesSlice";
 
 type AppState = {
   initialized: boolean;
@@ -15,7 +16,10 @@ export const initializeApp = createAsyncThunk(
   async (_, { dispatch }) => {
     const me = await dispatch(fetchMe());
     if (fetchMe.fulfilled.match(me) && me.payload) {
-      await dispatch(fetchFriendRequests());
+      await Promise.all([
+        dispatch(fetchFriendRequests()),
+        dispatch(fetchConversations()),
+      ]);
     }
   }
 );

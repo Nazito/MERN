@@ -1,8 +1,6 @@
 import type { Metadata } from "next";
 import { DM_Sans, Fraunces } from "next/font/google";
-import StoreProvider from "@/components/providers/StoreProvider";
-import ThemeRegistry from "@/components/providers/ThemeRegistry";
-import AppShell from "@/components/layout/AppShell";
+import Providers from "@/components/providers/Providers";
 import "./globals.css";
 
 const dmSans = DM_Sans({
@@ -28,11 +26,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${dmSans.variable} ${fraunces.variable}`}>
-        <StoreProvider>
-          <ThemeRegistry>
-            <AppShell>{children}</AppShell>
-          </ThemeRegistry>
-        </StoreProvider>
+        <Providers>{children}</Providers>
       </body>
     </html>
   );

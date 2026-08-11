@@ -52,8 +52,20 @@ function initSocket(httpServer) {
 }
 
 function emitToUser(userId, event, payload) {
-  if (!io) return
-  io.to(`user:${String(userId)}`).emit(event, payload)
+  if (!io) {
+    console.warn('[socket] emit skipped — io not initialized', event)
+    return
+  }
+  const id = String(userId)
+  const sockets = userSockets.get(id)
+  if (sockets && sockets.size > 0) {
+    for (const socketId of sockets) {
+      io.to(socketId).emit(event, payload)
+    }
+    return
+  }
+  // Fallback when map is empty but room may still have sockets
+  io.to(`user:${id}`).emit(event, payload)
 }
 
 module.exports = {
