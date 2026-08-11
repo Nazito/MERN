@@ -1,7 +1,7 @@
 import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
 import { authAPI } from "@/lib/api";
 
-type AuthUser = {
+export type AuthUser = {
   name?: string;
   userId?: string;
   message?: string;
@@ -24,20 +24,7 @@ const initialState: AuthState = {
   status: "idle",
 };
 
-export const login = createAsyncThunk(
-  "auth/login",
-  async (form: { email: string; password: string }, { rejectWithValue }) => {
-    try {
-      const response = await authAPI.login(form);
-      localStorage.setItem("token", response.data.loginToken);
-      return response.data.user as AuthUser;
-    } catch (error: unknown) {
-      const err = error as { response?: { data?: { message?: string } } };
-      return rejectWithValue(err?.response?.data?.message || "Login failed");
-    }
-  }
-);
-
+/** Register only — session is created via NextAuth signIn afterwards */
 export const register = createAsyncThunk(
   "auth/register",
   async (
@@ -46,7 +33,6 @@ export const register = createAsyncThunk(
   ) => {
     try {
       const response = await authAPI.register(form);
-      localStorage.setItem("token", response.data.registerToken);
       return response.data.user as AuthUser;
     } catch (error: unknown) {
       const err = error as { response?: { data?: { message?: string } } };
@@ -57,32 +43,24 @@ export const register = createAsyncThunk(
   }
 );
 
-export const fetchMe = createAsyncThunk(
-  "auth/fetchMe",
-  async (_, { rejectWithValue }) => {
-    const token =
-      typeof window !== "undefined" ? localStorage.getItem("token") : null;
-    if (!token) return null;
-
-    try {
-      const response = await authAPI.me();
-      localStorage.setItem("token", response.data.token);
-      return response.data.user as AuthUser;
-    } catch {
-      localStorage.removeItem("token");
-      return rejectWithValue("Session expired");
-    }
-  }
-);
-
 const authSlice = createSlice({
   name: "auth",
   initialState,
   reducers: {
-    logout(state) {
-      if (typeof window !== "undefined") {
-        localStorage.removeItem("token");
+    hydrateFromSession(state, action: PayloadAction<AuthUser | null>) {
+      if (action.payload?.userId) {
+        state.isAuth = true;
+        state.currentUser = action.payload;
+        state.name = action.payload.name || null;
+        state.status = "succeeded";
+      } else {
+        state.isAuth = false;
+        state.currentUser = null;
+        state.name = null;
+        state.status = "succeeded";
       }
+    },
+    logout(state) {
       state.currentUser = null;
       state.name = null;
       state.isAuth = false;
@@ -90,6 +68,9 @@ const authSlice = createSlice({
     },
     clearAuthMessage(state) {
       state.authMsg = null;
+    },
+    setAuthMessage(state, action: PayloadAction<string | null>) {
+      state.authMsg = action.payload;
     },
     setAuthProfile(
       state,
@@ -108,44 +89,22 @@ const authSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
-      .addCase(login.fulfilled, (state, action: PayloadAction<AuthUser>) => {
-        state.isAuth = true;
-        state.currentUser = action.payload;
-        state.name = action.payload.name || null;
-        state.authMsg = action.payload.message || null;
-        state.status = "succeeded";
-      })
-      .addCase(login.rejected, (state, action) => {
-        state.authMsg = (action.payload as string) || "Login failed";
-        state.status = "failed";
-      })
-      .addCase(register.fulfilled, (state, action: PayloadAction<AuthUser>) => {
-        state.isAuth = true;
-        state.currentUser = action.payload;
-        state.name = action.payload.name || null;
-        state.authMsg = action.payload.message || null;
-        state.status = "succeeded";
-      })
       .addCase(register.rejected, (state, action) => {
         state.authMsg = (action.payload as string) || "Registration failed";
         state.status = "failed";
       })
-      .addCase(fetchMe.fulfilled, (state, action) => {
-        if (action.payload) {
-          state.isAuth = true;
-          state.currentUser = action.payload;
-          state.name = action.payload.name || null;
-        }
+      .addCase(register.fulfilled, (state) => {
+        state.authMsg = null;
         state.status = "succeeded";
-      })
-      .addCase(fetchMe.rejected, (state) => {
-        state.isAuth = false;
-        state.currentUser = null;
-        state.name = null;
-        state.status = "failed";
       });
   },
 });
 
-export const { logout, clearAuthMessage, setAuthProfile } = authSlice.actions;
+export const {
+  logout,
+  clearAuthMessage,
+  setAuthMessage,
+  setAuthProfile,
+  hydrateFromSession,
+} = authSlice.actions;
 export default authSlice.reducer;

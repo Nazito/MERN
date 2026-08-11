@@ -1,12 +1,15 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   async rewrites() {
-    return [
-      {
-        source: "/api/:path*",
-        destination: "http://localhost:5001/api/:path*",
-      },
-    ];
+    // fallback: after App Router handlers (e.g. /api/nextauth) are checked
+    return {
+      fallback: [
+        {
+          source: "/api/:path*",
+          destination: "http://localhost:5001/api/:path*",
+        },
+      ],
+    };
   },
   images: {
     remotePatterns: [

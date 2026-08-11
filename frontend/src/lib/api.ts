@@ -1,5 +1,9 @@
 import axios from "axios";
 import { notifyFromServer } from "@/lib/notificationBus";
+import {
+  getAccessTokenCache,
+  resolveAccessToken,
+} from "@/lib/sessionToken";
 
 const api = axios.create({
   baseURL: "/",
@@ -8,9 +12,12 @@ const api = axios.create({
   },
 });
 
-api.interceptors.request.use((config) => {
+api.interceptors.request.use(async (config) => {
   if (typeof window !== "undefined") {
-    const token = localStorage.getItem("token");
+    let token = getAccessTokenCache();
+    if (!token) {
+      token = await resolveAccessToken();
+    }
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }

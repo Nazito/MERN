@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
+import { useSession } from "next-auth/react";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { initializeApp } from "@/store/slices/appSlice";
 import Box from "@mui/material/Box";
@@ -11,12 +12,13 @@ import Sidebar from "@/components/layout/Sidebar";
 export default function AppShell({ children }: { children: React.ReactNode }) {
   const dispatch = useAppDispatch();
   const initialized = useAppSelector((s) => s.app.initialized);
+  const { status } = useSession();
 
   useEffect(() => {
     dispatch(initializeApp());
   }, [dispatch]);
 
-  if (!initialized) {
+  if (!initialized || status === "loading") {
     return (
       <Box
         minHeight="100dvh"

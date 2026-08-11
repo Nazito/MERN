@@ -2,6 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import { usePathname } from "next/navigation";
+import { useSession } from "next-auth/react";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import {
   fetchFriendRequests,
@@ -23,6 +24,10 @@ import {
   disconnectSocket,
   subscribeSocket,
 } from "@/lib/socket";
+import {
+  getAccessTokenCache,
+  setAccessTokenCache,
+} from "@/lib/sessionToken";
 
 function normalizeRequest(payload: FriendRequest): FriendRequest | null {
   if (!payload?.from?._id) return null;
@@ -45,9 +50,12 @@ export default function SocketProvider({
   children: React.ReactNode;
 }) {
   const dispatch = useAppDispatch();
+  const { data: session, status: sessionStatus } = useSession();
   const isAuth = useAppSelector((s) => s.auth.isAuth);
   const activeId = useAppSelector((s) => s.messages?.activeId ?? null);
   const pathname = usePathname();
+  const accessToken =
+    session?.accessToken || getAccessTokenCache() || null;
 
   const activeIdRef = useRef(activeId);
   const pathnameRef = useRef(pathname);
@@ -80,18 +88,20 @@ export default function SocketProvider({
   }, [unreadTotal]);
 
   useEffect(() => {
-    if (!isAuth) {
+    if (sessionStatus === "loading") return;
+
+    if (!isAuth || sessionStatus !== "authenticated" || !accessToken) {
       disconnectSocket();
-      dispatch(resetMessagesState());
-      seenMessageIds.current.clear();
+      if (!isAuth || sessionStatus === "unauthenticated") {
+        dispatch(resetMessagesState());
+        seenMessageIds.current.clear();
+        setAccessTokenCache(null);
+      }
       return;
     }
 
-    const token =
-      typeof window !== "undefined" ? localStorage.getItem("token") : null;
-    if (!token) return;
-
-    connectSocket(token);
+    setAccessTokenCache(accessToken);
+    connectSocket(accessToken);
 
     const onEvent = (event: string, raw: unknown) => {
       if (event === "friend:request") {
@@ -174,7 +184,6 @@ export default function SocketProvider({
 
     const unsubscribe = subscribeSocket(onEvent);
 
-    // Backup poll if socket drops — pick up new previews for badges
     const pollId = window.setInterval(() => {
       dispatch(fetchConversations());
     }, 15000);
@@ -183,7 +192,7 @@ export default function SocketProvider({
       unsubscribe();
       window.clearInterval(pollId);
     };
-  }, [isAuth, dispatch]);
+  }, [isAuth, accessToken, sessionStatus, dispatch]);
 
   return <>{children}</>;
 }
