@@ -1,0 +1,22 @@
+{
+  "port": "PORT",
+  "jwtSecret": "JWT_SECRET",
+  "mongoUri": "MONGO_URI",
+  "clientUrl": "CLIENT_URL",
+  "clientUrls": {
+    "__name": "CLIENT_URLS",
+    "__format": "json"
+  },
+  "cloudinary": {
+    "cloudName": "CLOUDINARY_CLOUD_NAME",
+    "apiKey": "CLOUDINARY_API_KEY",
+    "apiSecret": "CLOUDINARY_API_SECRET"
+  },
+  "mail": {
+    "host": "MAIL_HOST",
+    "port": "MAIL_PORT",
+    "user": "MAIL_USER",
+    "pass": "MAIL_PASS",
+    "from": "MAIL_FROM"
+  }
+}

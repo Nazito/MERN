@@ -8,10 +8,32 @@ let io = null
 /** @type {Map<string, Set<string>>} */
 const userSockets = new Map()
 
+function corsOrigins() {
+  const origins = new Set(['http://localhost:3000'])
+  try {
+    if (config.has('clientUrl')) {
+      origins.add(String(config.get('clientUrl')))
+    }
+  } catch (_) {
+    /* ignore */
+  }
+  try {
+    if (config.has('clientUrls')) {
+      const list = config.get('clientUrls')
+      if (Array.isArray(list)) {
+        list.forEach((url) => origins.add(String(url)))
+      }
+    }
+  } catch (_) {
+    /* ignore */
+  }
+  return [...origins]
+}
+
 function initSocket(httpServer) {
   io = new Server(httpServer, {
     cors: {
-      origin: [config.get('clientUrl'), 'http://localhost:3000'],
+      origin: corsOrigins(),
       methods: ['GET', 'POST'],
       credentials: true,
     },
